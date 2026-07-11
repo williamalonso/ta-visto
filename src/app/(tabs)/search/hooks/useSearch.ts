@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { TmdbResult } from '@/types'
 import { searchMovies, searchSeries } from '@/lib/tmdb'
-import { useDebounce } from './useDebounce'
+import { useDebounce } from '@/hooks/useDebounce'
 
 export function useSearch() {
   const [query, setQuery] = useState('')
