@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   tabBarIcon: {
-    marginBottom: 0,
+    marginBottom: 2,
   },
   tabBarItem: {
     paddingTop: 4,
