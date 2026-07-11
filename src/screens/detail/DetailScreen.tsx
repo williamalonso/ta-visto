@@ -18,7 +18,7 @@ export default function DetailScreen() {
   const { id, mediaType } = useLocalSearchParams<{ id: string; mediaType: string }>()
   const [statusSelectorVisible, setStatusSelectorVisible] = useState(false)
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
-  const [pendingEpisodeKey, setPendingEpisodeKey] = useState<string | null>(null)
+  const [pendingEpisodeKeys, setPendingEpisodeKeys] = useState<string[] | null>(null)
 
   const {
     item,
@@ -86,13 +86,20 @@ export default function DetailScreen() {
                 watchedEpisodes={item.watchedEpisodes ?? []}
                 onToggleEpisode={(key) => {
                   if (isPreview) {
-                    setPendingEpisodeKey(key)
+                    setPendingEpisodeKeys([key])
                     setStatusSelectorVisible(true)
                   } else {
                     handleToggleEpisode(key)
                   }
                 }}
-                onMarkEpisodes={handleMarkEpisodes}
+                onMarkEpisodes={(keys) => {
+                  if (isPreview) {
+                    setPendingEpisodeKeys(keys)
+                    setStatusSelectorVisible(true)
+                  } else {
+                    handleMarkEpisodes(keys)
+                  }
+                }}
                 onUnmarkEpisodes={handleUnmarkEpisodes}
               />
             ) : null}
@@ -111,13 +118,13 @@ export default function DetailScreen() {
         visible={statusSelectorVisible}
         mediaType={item.mediaType}
         onSelect={async (status) => {
-          if (isPreview) await handleAdd(status, pendingEpisodeKey ? [pendingEpisodeKey] : undefined)
+          if (isPreview) await handleAdd(status, pendingEpisodeKeys ?? undefined)
           else await handleStatusChange(status)
-          setPendingEpisodeKey(null)
+          setPendingEpisodeKeys(null)
           setStatusSelectorVisible(false)
         }}
         onClose={() => {
-          setPendingEpisodeKey(null)
+          setPendingEpisodeKeys(null)
           setStatusSelectorVisible(false)
         }}
       />

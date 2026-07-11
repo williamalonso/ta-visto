@@ -77,6 +77,7 @@ export interface TmdbTvDetail {
   vote_average: number
   number_of_seasons: number
   number_of_episodes: number
+  status: string
   genres: { id: number; name: string }[]
   seasons: TmdbTvSeason[]
   episode_run_time: number[]

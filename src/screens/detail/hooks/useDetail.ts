@@ -75,12 +75,35 @@ export function useDetail(id: string, mediaType: string) {
     }
   }
 
+  const autoStatusOnMark = (next: string[]): MediaStatus | null => {
+    if (!tvDetail) return null
+    const allKeys = tvDetail.seasons.flatMap((s) =>
+      Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
+    )
+    if (allKeys.length === 0 || !allKeys.every((k) => next.includes(k))) return null
+    const ended = tvDetail.status === 'Ended' || tvDetail.status === 'Canceled'
+    return ended ? 'completed' : 'up_to_date'
+  }
+
+  const seriesChanges = (next: string[], unmarking: boolean): Partial<MediaItem> => {
+    const changes: Partial<MediaItem> = { watchedEpisodes: next }
+    if (!localItem) return changes
+    if (unmarking) {
+      changes.status = 'watching'
+    } else {
+      const auto = autoStatusOnMark(next)
+      if (auto) changes.status = auto
+    }
+    return changes
+  }
+
   const handleToggleEpisode = async (key: string) => {
     if (!localItem) return
     const current = localItem.watchedEpisodes ?? []
-    const next = current.includes(key) ? current.filter((k) => k !== key) : [...current, key]
+    const unmarking = current.includes(key)
+    const next = unmarking ? current.filter((k) => k !== key) : [...current, key]
     if (localItem.mediaType === 'movie') await updateMovie(localItem.id, { watchedEpisodes: next })
-    else await updateSeries(localItem.id, { watchedEpisodes: next })
+    else await updateSeries(localItem.id, seriesChanges(next, unmarking))
   }
 
   const handleMarkEpisodes = async (keys: string[]) => {
@@ -88,7 +111,7 @@ export function useDetail(id: string, mediaType: string) {
     const current = localItem.watchedEpisodes ?? []
     const next = [...new Set([...current, ...keys])]
     if (localItem.mediaType === 'movie') await updateMovie(localItem.id, { watchedEpisodes: next })
-    else await updateSeries(localItem.id, { watchedEpisodes: next })
+    else await updateSeries(localItem.id, seriesChanges(next, false))
   }
 
   const handleUnmarkEpisodes = async (keys: string[]) => {
@@ -96,7 +119,7 @@ export function useDetail(id: string, mediaType: string) {
     const current = localItem.watchedEpisodes ?? []
     const next = current.filter((k) => !keys.includes(k))
     if (localItem.mediaType === 'movie') await updateMovie(localItem.id, { watchedEpisodes: next })
-    else await updateSeries(localItem.id, { watchedEpisodes: next })
+    else await updateSeries(localItem.id, seriesChanges(next, true))
   }
 
   const handleAdd = async (status: MediaStatus, watchedEpisodes?: string[]) => {
