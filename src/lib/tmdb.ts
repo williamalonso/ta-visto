@@ -167,3 +167,24 @@ export async function getTvDetails(tmdbId: number): Promise<TmdbTvDetail> {
 export async function getSeasonDetails(tmdbId: number, seasonNumber: number): Promise<TmdbSeasonDetail> {
   return get<TmdbSeasonDetail>(`/tv/${tmdbId}/season/${seasonNumber}`)
 }
+
+export interface TmdbWatchProvider {
+  provider_id: number
+  provider_name: string
+  logo_path: string
+  display_priority: number
+}
+
+export interface TmdbWatchProviderResult {
+  flatrate?: TmdbWatchProvider[]
+  rent?: TmdbWatchProvider[]
+  buy?: TmdbWatchProvider[]
+  link: string
+}
+
+export async function getWatchProviders(tmdbId: number, mediaType: 'movie' | 'tv'): Promise<TmdbWatchProviderResult | null> {
+  const data = await get<{ results: Record<string, TmdbWatchProviderResult> }>(
+    `/${mediaType === 'movie' ? 'movie' : 'tv'}/${tmdbId}/watch/providers`
+  )
+  return data.results?.['BR'] ?? null
+}

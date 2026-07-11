@@ -1,4 +1,5 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native'
+import { router } from 'expo-router'
 import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
 import { colors, spacing, typography, radius } from '@/theme'
@@ -8,7 +9,10 @@ export function RecentCard({ item }: { item: MediaItem }) {
   const year = item.releaseDate ? item.releaseDate.slice(0, 4) : ''
 
   return (
-    <View style={styles.card}>
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
+      onPress={() => router.push({ pathname: '/detail/[id]', params: { id: item.id, mediaType: item.mediaType } } as any)}
+    >
       {posterUrl ? (
         <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
       ) : (
@@ -20,7 +24,7 @@ export function RecentCard({ item }: { item: MediaItem }) {
         {item.title}
       </Text>
       <Text style={styles.year}>{year}</Text>
-    </View>
+    </Pressable>
   )
 }
 

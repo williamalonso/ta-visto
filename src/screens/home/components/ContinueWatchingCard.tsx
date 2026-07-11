@@ -5,7 +5,12 @@ import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
 import { colors, spacing, typography, radius, shadows } from '@/theme'
 
-export function ContinueWatchingCard({ item }: { item: MediaItem }) {
+interface Props {
+  item: MediaItem
+  onPlayPress: () => void
+}
+
+export function ContinueWatchingCard({ item, onPlayPress }: Props) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
   return (
     <Pressable
@@ -23,13 +28,17 @@ export function ContinueWatchingCard({ item }: { item: MediaItem }) {
         <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
         <Text style={styles.type}>{item.mediaType === 'movie' ? 'Filme' : 'Série'}</Text>
       </View>
-      <View style={styles.playButton}>
+      <Pressable
+        style={({ pressed }) => [styles.playButton, pressed && { opacity: 0.7 }]}
+        onPress={(e) => { e.stopPropagation?.(); onPlayPress() }}
+        hitSlop={8}
+      >
         <SymbolView
           name={{ ios: 'play.fill', android: 'play_arrow', web: 'play_arrow' }}
           size={14}
           tintColor={colors.white}
         />
-      </View>
+      </Pressable>
     </Pressable>
   )
 }
