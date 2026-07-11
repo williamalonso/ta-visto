@@ -7,7 +7,7 @@ import { MediaCard } from '@/components/MediaCard'
 import { StatusSelector } from '@/components/StatusSelector'
 import { MediaItem, MediaStatus } from '@/types'
 import { colors, spacing, typography } from '@/theme'
-import { buildSectionRows, SectionRow } from '@/utils/groupByStatus'
+import { buildSectionRows, SectionRow, STATUS_LABELS, SortOrder, sortItems } from '@/utils/groupByStatus'
 import { SeriesLoading } from './components/SeriesLoading'
 import { SeriesHeader } from './components/SeriesHeader'
 import { SeriesEmpty } from './components/SeriesEmpty'
@@ -20,6 +20,7 @@ export default function SeriesScreen() {
   const width = Math.min(rawWidth, 480)
   const cardWidth = (width - spacing.xl * 2 - spacing.md * (NUM_COLUMNS - 1)) / NUM_COLUMNS
   const [filter, setFilter] = useState<MediaStatus | 'all'>('all')
+  const [sort, setSort] = useState<SortOrder>('recent')
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null)
 
   useFocusEffect(
@@ -30,8 +31,8 @@ export default function SeriesScreen() {
 
   const filtered = filter === 'all' ? series : series.filter((s) => s.status === filter)
   const rows: SectionRow[] = filter === 'all'
-    ? buildSectionRows(filtered, NUM_COLUMNS)
-    : [{ type: 'cards', items: filtered, key: 'all' }]
+    ? buildSectionRows(filtered, NUM_COLUMNS, sort)
+    : [{ type: 'cards', items: sortItems(filtered, sort), key: 'all' }]
 
   const handleStatusChange = async (status: MediaStatus) => {
     if (!editingItem) return
@@ -43,13 +44,19 @@ export default function SeriesScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
-      <SeriesHeader count={series.length} filter={filter} onFilterChange={setFilter} />
+      <SeriesHeader count={series.length} filter={filter} sort={sort} onFilterChange={setFilter} onSortChange={setSort} />
 
       <FlatList
         data={rows}
         keyExtractor={(item, i) => item.type === 'header' ? `h-${item.status}` : item.key ?? String(i)}
         contentContainerStyle={{ paddingBottom: spacing.xxxl }}
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={filter !== 'all' ? (
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionLabel}>{STATUS_LABELS[filter]}</Text>
+            <View style={styles.divider} />
+          </View>
+        ) : null}
         ListEmptyComponent={<SeriesEmpty filter={filter} />}
         renderItem={({ item: row }) => {
           if (row.type === 'header') {

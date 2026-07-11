@@ -1,5 +1,12 @@
 import { MediaItem, MediaStatus } from '@/types'
 
+export type SortOrder = 'recent' | 'alpha'
+
+export function sortItems(items: MediaItem[], sort: SortOrder): MediaItem[] {
+  if (sort === 'alpha') return [...items].sort((a, b) => a.title.localeCompare(b.title, 'pt'))
+  return [...items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+}
+
 export const STATUS_LABELS: Record<MediaStatus, string> = {
   watching:      'Assistindo',
   plan_to_watch: 'Quero Assistir',
@@ -14,11 +21,11 @@ export type SectionRow =
   | { type: 'header'; label: string; status: MediaStatus }
   | { type: 'cards'; items: MediaItem[]; key: string }
 
-export function buildSectionRows(items: MediaItem[], numColumns: number): SectionRow[] {
+export function buildSectionRows(items: MediaItem[], numColumns: number, sort: SortOrder = 'recent'): SectionRow[] {
   const rows: SectionRow[] = []
 
   for (const status of STATUS_ORDER) {
-    const group = items.filter((i) => i.status === status)
+    const group = sortItems(items.filter((i) => i.status === status), sort)
     if (group.length === 0) continue
 
     rows.push({ type: 'header', label: STATUS_LABELS[status], status })
