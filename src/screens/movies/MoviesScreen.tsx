@@ -1,4 +1,4 @@
-import { View, FlatList } from 'react-native'
+import { View, FlatList, useWindowDimensions } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect, router } from 'expo-router'
 import { useCallback, useState } from 'react'
@@ -13,6 +13,8 @@ import { MoviesEmpty } from './components/MoviesEmpty'
 
 export default function MoviesScreen() {
   const { movies, loading, reload, updateStatus, remove } = useMovies()
+  const { width } = useWindowDimensions()
+  const cardWidth = (width - spacing.xl * 2 - spacing.md * 2) / 3
   const [filter, setFilter] = useState<MediaStatus | 'all'>('all')
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null)
 
@@ -43,7 +45,7 @@ export default function MoviesScreen() {
         columnWrapperStyle={{ paddingHorizontal: spacing.xl, gap: spacing.md }}
         contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
         renderItem={({ item }) => (
-          <View style={{ flex: 1 }}>
+          <View style={{ width: cardWidth }}>
             <MediaCard
                 item={item}
                 onPress={() => router.push({ pathname: '/detail/[id]', params: { id: item.id, mediaType: item.mediaType } })}
