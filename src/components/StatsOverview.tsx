@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Platform } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { colors, radius, spacing, typography } from '@/theme'
 
@@ -6,15 +6,29 @@ interface StatCardProps {
   value: number
   label: string
   gradientColors: [string, string]
+  glowColor: string
 }
 
-function StatCard({ value, label, gradientColors }: StatCardProps) {
+function neonShadow(color: string) {
+  return Platform.select({
+    web: { boxShadow: `0 0 14px ${color}80, 0 4px 8px ${color}40` },
+    default: {
+      shadowColor: color,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.6,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+  })
+}
+
+function StatCard({ value, label, gradientColors, glowColor }: StatCardProps) {
   return (
     <LinearGradient
       colors={gradientColors}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={styles.card}
+      style={[styles.card, neonShadow(glowColor)]}
     >
       <Text style={styles.number}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
@@ -32,10 +46,10 @@ interface StatsOverviewProps {
 export function StatsOverview({ totalMovies, totalSeries, watching, completed }: StatsOverviewProps) {
   return (
     <View style={styles.grid}>
-      <StatCard value={totalMovies} label="Filmes" gradientColors={['#F59E0B', '#D97706']} />
-      <StatCard value={totalSeries} label="Séries" gradientColors={['#10B981', '#059669']} />
-      <StatCard value={watching} label="Assistindo" gradientColors={['#3B82F6', '#2563EB']} />
-      <StatCard value={completed} label="Finalizados" gradientColors={['#8B5CF6', '#7C3AED']} />
+      <StatCard value={totalMovies} label="Filmes" gradientColors={['#F59E0B', '#D97706']} glowColor="#F59E0B" />
+      <StatCard value={totalSeries} label="Séries" gradientColors={['#10B981', '#059669']} glowColor="#10B981" />
+      <StatCard value={watching} label="Assistindo" gradientColors={['#3B82F6', '#2563EB']} glowColor="#3B82F6" />
+      <StatCard value={completed} label="Finalizados" gradientColors={['#8B5CF6', '#7C3AED']} glowColor="#8B5CF6" />
     </View>
   )
 }
