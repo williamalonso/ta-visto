@@ -1,37 +1,42 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Modal, Pressable, ScrollView, Image, ActivityIndicator, StyleSheet, Linking, Platform } from 'react-native'
+import { View, Text, Modal, Pressable, ScrollView, Image, ActivityIndicator, StyleSheet, Linking } from 'react-native'
 import { getWatchProviders, TmdbWatchProvider, TmdbWatchProviderResult } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
 import { colors, radius, spacing, typography } from '@/theme'
 
 const LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
 
-const PROVIDER_DEEP_LINKS: Record<number, { ios?: string; android?: string; web: string }> = {
-  8:   { ios: 'nflx://www.netflix.com/browse',   android: 'intent://www.netflix.com/browse#Intent;package=com.netflix.mediaclient;scheme=https;end', web: 'https://www.netflix.com' },
-  119: { ios: 'aiv://aiv/home',                  android: 'intent://www.amazon.com/gp/video/storefront#Intent;package=com.amazon.avod.thirdpartyclient;scheme=https;end', web: 'https://www.primevideo.com' },
-  337: { ios: 'disneyplus://',                   android: 'intent://disneyplus.com#Intent;package=com.disney.disneyplus;scheme=https;end', web: 'https://www.disneyplus.com' },
-  1899:{ ios: 'hbomax://',                        android: 'intent://play.max.com#Intent;package=com.hbo.hbonow;scheme=https;end', web: 'https://play.max.com' },
-  531: { ios: 'paramountplus://',                android: 'intent://www.paramountplus.com#Intent;package=com.cbs.app;scheme=https;end', web: 'https://www.paramountplus.com' },
-  307: { ios: 'globoplay://',                    android: 'intent://globoplay.globo.com#Intent;package=com.globo.globoplay;scheme=https;end', web: 'https://globoplay.globo.com' },
-  619: { ios: 'videos://',                       web: 'https://tv.apple.com' },
-  283: { ios: 'crunchyroll://',                  android: 'intent://crunchyroll.com#Intent;package=com.crunchyroll.crunchyroid;scheme=https;end', web: 'https://www.crunchyroll.com' },
-  167: { ios: 'mubi://',                         web: 'https://mubi.com' },
-  39:  { web: 'https://now.com' },
-  384: { ios: 'hbomax://',                       android: 'intent://play.max.com#Intent;package=com.hbo.hbonow;scheme=https;end', web: 'https://play.max.com' },
+// Web URLs — iOS/Android redirecionam pro app via Universal Links quando instalado
+const PROVIDER_URLS: Record<number, string> = {
+  8:    'https://www.netflix.com',
+  9:    'https://www.primevideo.com',
+  119:  'https://www.primevideo.com',
+  337:  'https://www.disneyplus.com',
+  118:  'https://play.max.com',
+  384:  'https://play.max.com',
+  425:  'https://play.max.com',
+  1825: 'https://play.max.com',
+  1899: 'https://play.max.com',
+  531:  'https://www.paramountplus.com',
+  307:  'https://globoplay.globo.com',
+  619:  'https://tv.apple.com',
+  350:  'https://tv.apple.com',
+  283:  'https://www.crunchyroll.com',
+  167:  'https://mubi.com',
+  39:   'https://now.com',
+  238:  'https://www.canalplus.com',
+  553:  'https://www.oldflix.com.br',
+  531:  'https://www.paramountplus.com',
+  2:    'https://tv.apple.com',
+  3:    'https://play.google.com/store/movies',
+  68:   'https://www.microsoft.com/en-us/store/movies-and-tv',
+  192:  'https://www.youtube.com',
+  10:   'https://www.amazon.com.br/gp/video/storefront',
 }
 
 function openProvider(providerId: number, tmdbLink: string) {
-  const entry = PROVIDER_DEEP_LINKS[providerId]
-  if (!entry) { Linking.openURL(tmdbLink); return }
-
-  const deepLink = Platform.OS === 'ios' ? entry.ios : Platform.OS === 'android' ? entry.android : undefined
-  if (deepLink) {
-    Linking.canOpenURL(deepLink).then((can) => {
-      Linking.openURL(can ? deepLink : entry.web)
-    })
-  } else {
-    Linking.openURL(entry.web)
-  }
+  const url = PROVIDER_URLS[providerId] ?? tmdbLink
+  Linking.openURL(url)
 }
 
 interface Props {
