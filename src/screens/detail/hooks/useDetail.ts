@@ -60,8 +60,19 @@ export function useDetail(id: string, mediaType: string) {
 
   const handleStatusChange = async (status: MediaStatus) => {
     if (!localItem) return
-    if (localItem.mediaType === 'movie') await updateMovieStatus(localItem.id, status)
-    else await updateSeriesStatus(localItem.id, status)
+    if (localItem.mediaType === 'movie') {
+      await updateMovieStatus(localItem.id, status)
+    } else {
+      if (status === 'completed' && tvDetail) {
+        const allKeys = tvDetail.seasons.flatMap((s) =>
+          Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
+        )
+        const merged = [...new Set([...(localItem.watchedEpisodes ?? []), ...allKeys])]
+        await updateSeries(localItem.id, { status, watchedEpisodes: merged })
+      } else {
+        await updateSeriesStatus(localItem.id, status)
+      }
+    }
   }
 
   const handleToggleEpisode = async (key: string) => {
