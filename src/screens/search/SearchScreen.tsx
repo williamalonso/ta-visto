@@ -1,6 +1,7 @@
 import { View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState, useCallback } from 'react'
+import { router } from 'expo-router'
 import { SearchResults } from '@/components/SearchResults'
 import { StatusSelector } from '@/components/StatusSelector'
 import { useSearch } from './hooks/useSearch'
@@ -15,8 +16,8 @@ import { useTrending } from './hooks/useTrending'
 
 export default function SearchScreen() {
   const { query, setQuery, mediaType, setMediaType, results, loading, error } = useSearch()
-  const { exists: movieExists, add: addMovie } = useMovies()
-  const { exists: seriesExists, add: addSeries } = useSeries()
+  const { movies, exists: movieExists, add: addMovie } = useMovies()
+  const { series, exists: seriesExists, add: addSeries } = useSeries()
   const { movies: trendingMovies, series: trendingSeries, loading: trendingLoading } = useTrending()
   const [pendingItem, setPendingItem] = useState<TmdbResult | null>(null)
 
@@ -30,8 +31,19 @@ export default function SearchScreen() {
     [movieExists, seriesExists]
   )
 
+  const handleCardPress = (item: TmdbResult) => {
+    const localItem =
+      item.mediaType === 'movie'
+        ? movies.find((m) => m.tmdbId === item.id)
+        : series.find((s) => s.tmdbId === item.id)
+    router.push({
+      pathname: '/detail/[id]',
+      params: { id: localItem ? localItem.id : String(item.id), mediaType: item.mediaType },
+    })
+  }
+
   const handleAdd = (item: TmdbResult) => {
-    if (isAdded(item.id)) return
+    if (isTrendingAdded(item.id, item.mediaType)) return
     setPendingItem(item)
   }
 
@@ -76,13 +88,14 @@ export default function SearchScreen() {
           loading={trendingLoading}
           isAdded={isTrendingAdded}
           onAdd={handleAdd}
+          onPress={handleCardPress}
         />
       )}
       {showNoResults && <SearchEmpty message="Nenhum resultado encontrado" />}
 
       {hasQuery && (loading || results.length > 0 || error !== null) && (
         <View style={{ flex: 1 }}>
-          <SearchResults results={results} loading={loading} error={error} isAdded={isAdded} onAdd={handleAdd} />
+          <SearchResults results={results} loading={loading} error={error} isAdded={isAdded} onAdd={handleAdd} onPress={handleCardPress} />
         </View>
       )}
 

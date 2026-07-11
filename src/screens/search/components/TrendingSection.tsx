@@ -6,17 +6,17 @@ import { colors, radius, spacing, typography } from '@/theme'
 interface TrendingCardProps {
   item: TmdbResult
   isAdded: boolean
+  onPress: () => void
   onAdd: () => void
 }
 
-function TrendingCard({ item, isAdded, onAdd }: TrendingCardProps) {
+function TrendingCard({ item, isAdded, onPress, onAdd }: TrendingCardProps) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
 
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={isAdded ? undefined : onAdd}
-      disabled={isAdded}
+      onPress={onPress}
     >
       <View style={styles.posterContainer}>
         {posterUrl ? (
@@ -26,9 +26,13 @@ function TrendingCard({ item, isAdded, onAdd }: TrendingCardProps) {
             <Text style={styles.placeholderText}>?</Text>
           </View>
         )}
-        <View style={[styles.badge, isAdded && styles.badgeAdded]}>
+        <Pressable
+          style={[styles.badge, isAdded && styles.badgeAdded]}
+          onPress={(e) => { e.stopPropagation?.(); if (!isAdded) onAdd() }}
+          hitSlop={6}
+        >
           <Text style={styles.badgeText}>{isAdded ? '✓' : '+'}</Text>
-        </View>
+        </Pressable>
       </View>
       <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
     </Pressable>
@@ -39,17 +43,18 @@ interface SectionProps {
   title: string
   items: TmdbResult[]
   isAdded: (id: number) => boolean
+  onPress: (item: TmdbResult) => void
   onAdd: (item: TmdbResult) => void
 }
 
-function TrendingRow({ title, items, isAdded, onAdd }: SectionProps) {
+function TrendingRow({ title, items, isAdded, onPress, onAdd }: SectionProps) {
   if (items.length === 0) return null
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         {items.map((item) => (
-          <TrendingCard key={item.id} item={item} isAdded={isAdded(item.id)} onAdd={() => onAdd(item)} />
+          <TrendingCard key={item.id} item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} />
         ))}
       </ScrollView>
     </View>
@@ -62,9 +67,10 @@ interface Props {
   loading: boolean
   isAdded: (id: number, mediaType: 'movie' | 'tv') => boolean
   onAdd: (item: TmdbResult) => void
+  onPress: (item: TmdbResult) => void
 }
 
-export function TrendingSection({ movies, series, loading, isAdded, onAdd }: Props) {
+export function TrendingSection({ movies, series, loading, isAdded, onAdd, onPress }: Props) {
   if (loading) {
     return (
       <View style={styles.loadingCenter}>
@@ -76,8 +82,8 @@ export function TrendingSection({ movies, series, loading, isAdded, onAdd }: Pro
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Em alta agora</Text>
-      <TrendingRow title="Filmes" items={movies} isAdded={(id) => isAdded(id, 'movie')} onAdd={onAdd} />
-      <TrendingRow title="Séries" items={series} isAdded={(id) => isAdded(id, 'tv')} onAdd={onAdd} />
+      <TrendingRow title="Filmes" items={movies} isAdded={(id) => isAdded(id, 'movie')} onPress={onPress} onAdd={onAdd} />
+      <TrendingRow title="Séries" items={series} isAdded={(id) => isAdded(id, 'tv')} onPress={onPress} onAdd={onAdd} />
     </ScrollView>
   )
 }

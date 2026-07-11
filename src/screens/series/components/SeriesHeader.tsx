@@ -30,12 +30,12 @@ export function SeriesHeader({ count, filter, sort, onFilterChange, onSortChange
           {count}
         </Text>
       </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
+        {STATUS_FILTERS.map((f) => (
+          <Chip key={f.value} label={f.label} active={filter === f.value} onPress={() => onFilterChange(f.value)} />
+        ))}
+      </ScrollView>
       <View style={styles.row}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }}>
-          {STATUS_FILTERS.map((f) => (
-            <Chip key={f.value} label={f.label} active={filter === f.value} onPress={() => onFilterChange(f.value)} />
-          ))}
-        </ScrollView>
         <View style={styles.sortBtns}>
           <Pressable onPress={() => onSortChange('recent')} style={[styles.sortBtn, sort === 'recent' && styles.sortBtnActive]}>
             <Text style={[styles.sortText, sort === 'recent' && styles.sortTextActive]}>Recentes</Text>

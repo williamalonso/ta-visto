@@ -30,6 +30,7 @@ export default function DetailScreen() {
     handleMarkEpisodes,
     handleUnmarkEpisodes,
     handleRemove,
+    isPreview,
     cast,
     directors,
     creators,
@@ -48,7 +49,7 @@ export default function DetailScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <DetailBackButton />
-          <Pressable
+          {!isPreview && <Pressable
             style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.6 }]}
             onPress={() => setDeleteModalVisible(true)}
           >
@@ -57,10 +58,10 @@ export default function DetailScreen() {
               size={22}
               tintColor={colors.error}
             />
-          </Pressable>
+          </Pressable>}
         </View>
         <DetailPosterInfo item={item} genres={genres} runtime={runtime} detailLoading={detailLoading} />
-        <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />
+        {!isPreview && <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />}
         {item.overview ? <DetailOverview overview={item.overview} /> : null}
         <DetailCast cast={cast} directors={directors} creators={creators} />
         {item.mediaType === 'tv' && (

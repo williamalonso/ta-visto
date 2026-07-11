@@ -7,17 +7,17 @@ import { colors, radius, spacing, typography, shadows } from '@/theme'
 interface SearchResultCardProps {
   item: TmdbResult
   isAdded: boolean
+  onPress: () => void
   onAdd: () => void
 }
 
-function SearchResultCard({ item, isAdded, onAdd }: SearchResultCardProps) {
+function SearchResultCard({ item, isAdded, onPress, onAdd }: SearchResultCardProps) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
 
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={isAdded ? undefined : onAdd}
-      disabled={isAdded}
+      onPress={onPress}
     >
       <View style={styles.posterContainer}>
         {posterUrl ? (
@@ -27,9 +27,13 @@ function SearchResultCard({ item, isAdded, onAdd }: SearchResultCardProps) {
             <Text style={styles.placeholderEmoji}>🎬</Text>
           </View>
         )}
-        <View style={[styles.addBadge, isAdded && styles.addBadgeAdded]}>
+        <Pressable
+          style={[styles.addBadge, isAdded && styles.addBadgeAdded]}
+          onPress={(e) => { e.stopPropagation?.(); if (!isAdded) onAdd() }}
+          hitSlop={6}
+        >
           <Text style={styles.addBadgeText}>{isAdded ? '✓' : '+'}</Text>
-        </View>
+        </Pressable>
       </View>
       <Text style={styles.title} numberOfLines={1}>
         {item.title}
@@ -53,9 +57,10 @@ interface SearchResultsProps {
   error: string | null
   isAdded: (tmdbId: number) => boolean
   onAdd: (item: TmdbResult) => void
+  onPress: (item: TmdbResult) => void
 }
 
-export function SearchResults({ results, loading, error, isAdded, onAdd }: SearchResultsProps) {
+export function SearchResults({ results, loading, error, isAdded, onAdd, onPress }: SearchResultsProps) {
   if (error) {
     return (
       <View style={styles.center}>
@@ -85,7 +90,7 @@ export function SearchResults({ results, loading, error, isAdded, onAdd }: Searc
       contentContainerStyle={styles.listContent}
       renderItem={({ item }) => (
         <View style={styles.gridItem}>
-          <SearchResultCard item={item} isAdded={isAdded(item.id)} onAdd={() => onAdd(item)} />
+          <SearchResultCard item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} />
         </View>
       )}
       showsVerticalScrollIndicator={false}
