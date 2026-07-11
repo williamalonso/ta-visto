@@ -3,7 +3,11 @@
   <p>App mobile pessoal para rastrear filmes e séries assistidos</p>
 </div>
 
-## Sobre
+<div align="center">
+  <img src="/src/assets/images/home.png" alt"Home page" title="Home page" width="600" />
+</div>
+
+## 🤔 Sobre
 
 Clone do TV Time — busca títulos via TMDB, organiza em listas por status (assistindo, pretendo assistir, finalizado etc.) e persiste tudo localmente no dispositivo. Suporta exportação e importação de backup em JSON.
 
@@ -15,7 +19,7 @@ Clone do TV Time — busca títulos via TMDB, organiza em listas por status (ass
 - **Séries** — mesma estrutura, com status extra "Em dia" para séries em andamento
 - **Configurações** — exportar e importar backup JSON dos seus dados
 
-## Stack
+## 🙅 Stack
 
 - **React Native** + **Expo** ~56
 - **TypeScript**
