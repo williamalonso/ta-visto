@@ -17,6 +17,7 @@ export interface MediaItem {
   status: MediaStatus
   rating: number | null
   notes: string | null
+  watchedEpisodes?: string[]
   createdAt: string
   updatedAt: string
 }

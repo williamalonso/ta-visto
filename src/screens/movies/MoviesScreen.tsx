@@ -1,6 +1,6 @@
 import { View, FlatList } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useFocusEffect } from 'expo-router'
+import { useFocusEffect, router } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { useMovies } from '@/hooks/useMovies'
 import { MediaCard } from '@/components/MediaCard'
@@ -44,7 +44,12 @@ export default function MoviesScreen() {
         contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.xxxl }}
         renderItem={({ item }) => (
           <View style={{ flex: 1 }}>
-            <MediaCard item={item} onPress={() => setEditingItem(item)} onRemove={remove} />
+            <MediaCard
+                item={item}
+                onPress={() => router.push({ pathname: '/detail/[id]', params: { id: item.id, mediaType: item.mediaType } })}
+                onStatusPress={() => setEditingItem(item)}
+                onRemove={remove}
+              />
           </View>
         )}
         ListEmptyComponent={<MoviesEmpty filter={filter} />}

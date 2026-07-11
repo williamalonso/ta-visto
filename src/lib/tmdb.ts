@@ -2,6 +2,7 @@ import { TmdbResult } from '@/types'
 
 const BASE_URL = 'https://api.themoviedb.org/3'
 export const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500'
+export const POSTER_LARGE_BASE_URL = 'https://image.tmdb.org/t/p/w780'
 
 interface TmdbMovieResult {
   id: number
@@ -26,9 +27,43 @@ interface TmdbSearchResponse<T> {
   total_results: number
 }
 
+export interface TmdbMovieDetail {
+  id: number
+  title: string
+  overview: string
+  poster_path: string | null
+  release_date: string
+  vote_average: number
+  runtime: number | null
+  genres: { id: number; name: string }[]
+}
+
+export interface TmdbTvSeason {
+  id: number
+  name: string
+  season_number: number
+  episode_count: number
+  air_date: string | null
+}
+
+export interface TmdbTvDetail {
+  id: number
+  name: string
+  overview: string
+  poster_path: string | null
+  first_air_date: string
+  vote_average: number
+  number_of_seasons: number
+  number_of_episodes: number
+  genres: { id: number; name: string }[]
+  seasons: TmdbTvSeason[]
+  episode_run_time: number[]
+}
+
 async function get<T>(path: string): Promise<T> {
   const token = process.env.EXPO_PUBLIC_TMDB_API_KEY ?? ''
-  const res = await fetch(`${BASE_URL}${path}&language=pt-BR`, {
+  const separator = path.includes('?') ? '&' : '?'
+  const res = await fetch(`${BASE_URL}${path}${separator}language=pt-BR`, {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (!res.ok) throw new Error(`TMDB ${res.status}`)
@@ -63,4 +98,33 @@ export async function searchSeries(query: string): Promise<TmdbResult[]> {
     voteAverage: s.vote_average,
     mediaType: 'tv' as const,
   }))
+}
+
+export interface TmdbEpisode {
+  id: number
+  name: string
+  episode_number: number
+  season_number: number
+  overview: string
+  air_date: string | null
+  vote_average: number
+}
+
+export interface TmdbSeasonDetail {
+  id: number
+  name: string
+  season_number: number
+  episodes: TmdbEpisode[]
+}
+
+export async function getMovieDetails(tmdbId: number): Promise<TmdbMovieDetail> {
+  return get<TmdbMovieDetail>(`/movie/${tmdbId}`)
+}
+
+export async function getTvDetails(tmdbId: number): Promise<TmdbTvDetail> {
+  return get<TmdbTvDetail>(`/tv/${tmdbId}`)
+}
+
+export async function getSeasonDetails(tmdbId: number, seasonNumber: number): Promise<TmdbSeasonDetail> {
+  return get<TmdbSeasonDetail>(`/tv/${tmdbId}/season/${seasonNumber}`)
 }

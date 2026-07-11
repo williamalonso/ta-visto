@@ -23,16 +23,17 @@ const STATUS_LABELS: Record<MediaStatus, string> = {
 interface MediaCardProps {
   item: MediaItem
   onPress: () => void
+  onStatusPress: () => void
   onRemove: (id: string) => void
 }
 
-export function MediaCard({ item, onPress, onRemove }: MediaCardProps) {
+export function MediaCard({ item, onPress, onStatusPress, onRemove }: MediaCardProps) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
   const [imgLoaded, setImgLoaded] = useState(false)
 
   const handleLongPress = () => {
     Alert.alert(item.title, undefined, [
-      { text: 'Mudar status', onPress },
+      { text: 'Mudar status', onPress: onStatusPress },
       { text: 'Remover', style: 'destructive', onPress: () => onRemove(item.id) },
       { text: 'Cancelar', style: 'cancel' },
     ])
