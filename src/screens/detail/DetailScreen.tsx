@@ -18,6 +18,7 @@ export default function DetailScreen() {
   const { id, mediaType } = useLocalSearchParams<{ id: string; mediaType: string }>()
   const [statusSelectorVisible, setStatusSelectorVisible] = useState(false)
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+  const [pendingEpisodeKey, setPendingEpisodeKey] = useState<string | null>(null)
 
   const {
     item,
@@ -83,7 +84,14 @@ export default function DetailScreen() {
                 seasons={tvDetail.seasons}
                 tmdbId={item.tmdbId}
                 watchedEpisodes={item.watchedEpisodes ?? []}
-                onToggleEpisode={handleToggleEpisode}
+                onToggleEpisode={(key) => {
+                  if (isPreview) {
+                    setPendingEpisodeKey(key)
+                    setStatusSelectorVisible(true)
+                  } else {
+                    handleToggleEpisode(key)
+                  }
+                }}
                 onMarkEpisodes={handleMarkEpisodes}
                 onUnmarkEpisodes={handleUnmarkEpisodes}
               />
@@ -103,11 +111,15 @@ export default function DetailScreen() {
         visible={statusSelectorVisible}
         mediaType={item.mediaType}
         onSelect={async (status) => {
-          if (isPreview) await handleAdd(status)
+          if (isPreview) await handleAdd(status, pendingEpisodeKey ? [pendingEpisodeKey] : undefined)
           else await handleStatusChange(status)
+          setPendingEpisodeKey(null)
           setStatusSelectorVisible(false)
         }}
-        onClose={() => setStatusSelectorVisible(false)}
+        onClose={() => {
+          setPendingEpisodeKey(null)
+          setStatusSelectorVisible(false)
+        }}
       />
     </SafeAreaView>
   )

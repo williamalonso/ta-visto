@@ -99,7 +99,7 @@ export function useDetail(id: string, mediaType: string) {
     else await updateSeries(localItem.id, { watchedEpisodes: next })
   }
 
-  const handleAdd = async (status: MediaStatus) => {
+  const handleAdd = async (status: MediaStatus, watchedEpisodes?: string[]) => {
     if (!previewItem) return
     const base = {
       tmdbId: previewItem.tmdbId,
@@ -112,6 +112,7 @@ export function useDetail(id: string, mediaType: string) {
       status,
       rating: null as null,
       notes: null as null,
+      ...(watchedEpisodes?.length ? { watchedEpisodes } : {}),
     }
     if (previewItem.mediaType === 'movie') await addMovie(base)
     else await addSeries(base)
