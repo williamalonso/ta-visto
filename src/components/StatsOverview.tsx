@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, Platform, Pressable } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
+import { router } from 'expo-router'
 import { colors, radius, spacing, typography } from '@/theme'
 
 interface StatCardProps {
@@ -44,15 +45,16 @@ interface StatsOverviewProps {
   totalSeries: number
   watching: number
   completed: number
+  onWatchingPress?: () => void
   onCompletedPress?: () => void
 }
 
-export function StatsOverview({ totalMovies, totalSeries, watching, completed, onCompletedPress }: StatsOverviewProps) {
+export function StatsOverview({ totalMovies, totalSeries, watching, completed, onWatchingPress, onCompletedPress }: StatsOverviewProps) {
   return (
     <View style={styles.grid}>
-      <StatCard value={totalMovies} label="Filmes" gradientColors={['#F59E0B', '#D97706']} glowColor="#F59E0B" />
-      <StatCard value={totalSeries} label="Séries" gradientColors={['#10B981', '#059669']} glowColor="#10B981" />
-      <StatCard value={watching} label="Assistindo" gradientColors={['#3B82F6', '#2563EB']} glowColor="#3B82F6" />
+      <StatCard value={totalMovies} label="Filmes" gradientColors={['#F59E0B', '#D97706']} glowColor="#F59E0B" onPress={() => router.push('/(tabs)/movies')} />
+      <StatCard value={totalSeries} label="Séries" gradientColors={['#10B981', '#059669']} glowColor="#10B981" onPress={() => router.push('/(tabs)/series')} />
+      <StatCard value={watching} label="Assistindo" gradientColors={['#3B82F6', '#2563EB']} glowColor="#3B82F6" onPress={onWatchingPress} />
       <StatCard value={completed} label="Finalizados" gradientColors={['#8B5CF6', '#7C3AED']} glowColor="#8B5CF6" onPress={onCompletedPress} />
     </View>
   )

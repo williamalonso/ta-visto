@@ -11,6 +11,7 @@ import { ContinueWatchingSection } from './components/ContinueWatchingSection'
 import { RecentSection } from './components/RecentSection'
 import { HomeEmptyState } from './components/HomeEmptyState'
 import { CompletedModal } from './components/CompletedModal'
+import { WatchingModal } from './components/WatchingModal'
 
 export default function HomeScreen() {
   const { movies, loading: moviesLoading, reload: reloadMovies } = useMovies()
@@ -25,6 +26,7 @@ export default function HomeScreen() {
   )
 
   const [completedVisible, setCompletedVisible] = useState(false)
+  const [watchingVisible, setWatchingVisible] = useState(false)
 
   const byDate = (a: { updatedAt: string }, b: { updatedAt: string }) =>
     new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -33,6 +35,8 @@ export default function HomeScreen() {
   const recentMovies = [...movies].sort(byDate).slice(0, 5)
   const recentSeries = [...series].sort(byDate).slice(0, 5)
   const watching = allItems.filter((m) => m.status === 'watching')
+  const watchingMovies = movies.filter((m) => m.status === 'watching').sort(byDate)
+  const watchingSeries = series.filter((s) => s.status === 'watching').sort(byDate)
   const completedMovies = movies.filter((m) => m.status === 'completed').sort(byDate)
   const completedSeries = series.filter((s) => s.status === 'completed').sort(byDate)
   const completedCount = completedMovies.length + completedSeries.length
@@ -51,6 +55,7 @@ export default function HomeScreen() {
           totalSeries={series.length}
           watching={watching.length}
           completed={completedCount}
+          onWatchingPress={() => setWatchingVisible(true)}
           onCompletedPress={() => setCompletedVisible(true)}
         />
         <ContinueWatchingSection items={watching} />
@@ -58,6 +63,13 @@ export default function HomeScreen() {
         <RecentSection title="Séries Recentes" items={recentSeries} />
         {allItems.length === 0 && !loading && <HomeEmptyState />}
       </ScrollView>
+
+      <WatchingModal
+        visible={watchingVisible}
+        movies={watchingMovies}
+        series={watchingSeries}
+        onClose={() => setWatchingVisible(false)}
+      />
 
       <CompletedModal
         visible={completedVisible}
