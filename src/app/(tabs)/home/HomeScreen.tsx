@@ -1,4 +1,4 @@
-import { ScrollView, View, Text, StyleSheet } from 'react-native'
+import { ScrollView, View, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect } from 'expo-router'
 import { useCallback } from 'react'
@@ -8,7 +8,8 @@ import { StatsOverview } from '@/components/StatsOverview'
 import { Skeleton } from '@/components/Skeleton'
 import { RecentCard } from './components/RecentCard'
 import { ContinueWatchingCard } from './components/ContinueWatchingCard'
-import { colors, spacing, typography, radius } from '@/theme'
+import { styles } from './styles'
+import { radius } from '@/theme'
 
 export default function HomeScreen() {
   const { movies, loading: moviesLoading, reload: reloadMovies } = useMovies()
@@ -100,81 +101,3 @@ export default function HomeScreen() {
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    padding: spacing.xl,
-    paddingBottom: spacing.xxxl,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xxl,
-  },
-  logo: {
-    ...typography.h2,
-    color: colors.textPrimary,
-  },
-  greeting: {
-    ...typography.body,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.pill,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    ...typography.auxiliary,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  sectionTitle: {
-    ...typography.sectionTitle,
-    color: colors.textPrimary,
-    marginBottom: spacing.md,
-  },
-  sectionTitleSpaced: {
-    marginTop: spacing.xxl,
-  },
-  statsSkeletonGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-  },
-  statSkeletonItem: {
-    flexBasis: '47%',
-    flexGrow: 1,
-  },
-  recentList: {
-    paddingRight: spacing.xl,
-  },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.huge,
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    ...typography.auxiliary,
-    color: colors.textAuxiliary,
-    textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-})

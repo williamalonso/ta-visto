@@ -1,7 +1,7 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image } from 'react-native'
 import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
-import { colors, spacing, typography, radius } from '@/theme'
+import { recentCardStyles as styles } from './styles'
 
 export function RecentCard({ item }: { item: MediaItem }) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
@@ -23,36 +23,3 @@ export function RecentCard({ item }: { item: MediaItem }) {
     </View>
   )
 }
-
-const styles = StyleSheet.create({
-  card: {
-    width: 72,
-    marginRight: spacing.md,
-  },
-  poster: {
-    width: 72,
-    height: 108,
-    borderRadius: radius.md,
-  },
-  posterPlaceholder: {
-    width: 72,
-    height: 108,
-    borderRadius: radius.md,
-    backgroundColor: colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderEmoji: {
-    fontSize: 24,
-  },
-  title: {
-    ...typography.auxiliary,
-    fontWeight: '600',
-    color: colors.textPrimary,
-    marginTop: spacing.xs,
-  },
-  year: {
-    ...typography.auxiliary,
-    color: colors.textAuxiliary,
-  },
-})

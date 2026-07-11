@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState, useCallback } from 'react'
 import { Chip } from '@/components/Chip'
@@ -9,7 +9,7 @@ import { useSearch } from './hooks/useSearch'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { TmdbResult, MediaStatus } from '@/types'
-import { colors, spacing, typography } from '@/theme'
+import { styles } from './styles'
 
 export default function SearchScreen() {
   const { query, setQuery, mediaType, setMediaType, results, loading, error } = useSearch()
@@ -100,35 +100,3 @@ export default function SearchScreen() {
     </SafeAreaView>
   )
 }
-
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  header: {
-    padding: spacing.xl,
-    gap: spacing.md,
-    backgroundColor: colors.background,
-  },
-  title: {
-    ...typography.h2,
-    color: colors.textPrimary,
-  },
-  chips: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  emptyPrompt: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    ...typography.body,
-    color: colors.textAuxiliary,
-  },
-  resultsContainer: {
-    flex: 1,
-  },
-})
