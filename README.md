@@ -4,7 +4,7 @@
 </div>
 
 <div align="center">
-  <img src="/src/assets/images/home.png" alt"Home page" title="Home page" width="600" />
+  <img src="/src/assets/images/home.png" alt"Home page" title="Home page" width="300" />
 </div>
 
 ## 🤔 Sobre
