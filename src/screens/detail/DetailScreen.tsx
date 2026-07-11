@@ -1,4 +1,4 @@
-import { View, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, ScrollView, ActivityIndicator, StyleSheet, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
@@ -10,11 +10,14 @@ import { DetailStatusCard } from './components/DetailStatusCard'
 import { DetailOverview } from './components/DetailOverview'
 import { useDetail } from './hooks/useDetail'
 import { DetailCast } from './components/DetailCast'
+import { SymbolView } from 'expo-symbols'
+import { DeleteConfirmModal } from './components/DeleteConfirmModal'
 import { colors, spacing } from '@/theme'
 
 export default function DetailScreen() {
   const { id, mediaType } = useLocalSearchParams<{ id: string; mediaType: string }>()
   const [statusSelectorVisible, setStatusSelectorVisible] = useState(false)
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false)
 
   const {
     item,
@@ -26,6 +29,7 @@ export default function DetailScreen() {
     handleToggleEpisode,
     handleMarkEpisodes,
     handleUnmarkEpisodes,
+    handleRemove,
     cast,
     directors,
     creators,
@@ -42,7 +46,19 @@ export default function DetailScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <DetailBackButton />
+        <View style={styles.header}>
+          <DetailBackButton />
+          <Pressable
+            style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.6 }]}
+            onPress={() => setDeleteModalVisible(true)}
+          >
+            <SymbolView
+              name={{ ios: 'trash', android: 'delete', web: 'delete' }}
+              size={22}
+              tintColor={colors.error}
+            />
+          </Pressable>
+        </View>
         <DetailPosterInfo item={item} genres={genres} runtime={runtime} detailLoading={detailLoading} />
         <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />
         {item.overview ? <DetailOverview overview={item.overview} /> : null}
@@ -64,6 +80,13 @@ export default function DetailScreen() {
           </View>
         )}
       </ScrollView>
+
+      <DeleteConfirmModal
+        visible={deleteModalVisible}
+        title={item.title}
+        onConfirm={handleRemove}
+        onClose={() => setDeleteModalVisible(false)}
+      />
 
       <StatusSelector
         visible={statusSelectorVisible}
@@ -92,6 +115,15 @@ const styles = StyleSheet.create({
   scroll: {
     padding: spacing.xl,
     paddingBottom: spacing.xxxl,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
+  deleteBtn: {
+    padding: spacing.sm,
   },
   section: {
     marginTop: spacing.md,

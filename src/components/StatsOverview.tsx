@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import { View, Text, StyleSheet, Platform, Pressable } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { colors, radius, spacing, typography } from '@/theme'
 
@@ -7,6 +7,7 @@ interface StatCardProps {
   label: string
   gradientColors: [string, string]
   glowColor: string
+  onPress?: () => void
 }
 
 function neonShadow(color: string) {
@@ -22,17 +23,19 @@ function neonShadow(color: string) {
   })
 }
 
-function StatCard({ value, label, gradientColors, glowColor }: StatCardProps) {
+function StatCard({ value, label, gradientColors, glowColor, onPress }: StatCardProps) {
   return (
-    <LinearGradient
-      colors={gradientColors}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={[styles.card, neonShadow(glowColor)]}
-    >
-      <Text style={styles.number}>{value}</Text>
-      <Text style={styles.label}>{label}</Text>
-    </LinearGradient>
+    <Pressable style={styles.cardWrapper} onPress={onPress}>
+      <LinearGradient
+        colors={gradientColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.card, neonShadow(glowColor)]}
+      >
+        <Text style={styles.number}>{value}</Text>
+        <Text style={styles.label}>{label}</Text>
+      </LinearGradient>
+    </Pressable>
   )
 }
 
@@ -41,15 +44,16 @@ interface StatsOverviewProps {
   totalSeries: number
   watching: number
   completed: number
+  onCompletedPress?: () => void
 }
 
-export function StatsOverview({ totalMovies, totalSeries, watching, completed }: StatsOverviewProps) {
+export function StatsOverview({ totalMovies, totalSeries, watching, completed, onCompletedPress }: StatsOverviewProps) {
   return (
     <View style={styles.grid}>
       <StatCard value={totalMovies} label="Filmes" gradientColors={['#F59E0B', '#D97706']} glowColor="#F59E0B" />
       <StatCard value={totalSeries} label="Séries" gradientColors={['#10B981', '#059669']} glowColor="#10B981" />
       <StatCard value={watching} label="Assistindo" gradientColors={['#3B82F6', '#2563EB']} glowColor="#3B82F6" />
-      <StatCard value={completed} label="Finalizados" gradientColors={['#8B5CF6', '#7C3AED']} glowColor="#8B5CF6" />
+      <StatCard value={completed} label="Finalizados" gradientColors={['#8B5CF6', '#7C3AED']} glowColor="#8B5CF6" onPress={onCompletedPress} />
     </View>
   )
 }
@@ -60,9 +64,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.md,
   },
-  card: {
+  cardWrapper: {
     flexBasis: '47%',
     flexGrow: 1,
+  },
+  card: {
     height: 84,
     borderRadius: radius.lg,
     padding: spacing.lg,

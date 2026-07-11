@@ -141,6 +141,21 @@ export interface TmdbSeasonDetail {
   episodes: TmdbEpisode[]
 }
 
+export async function getTrending(mediaType: 'movie' | 'tv'): Promise<TmdbResult[]> {
+  const data = await get<TmdbSearchResponse<TmdbMovieResult & TmdbSeriesResult>>(
+    `/trending/${mediaType}/week`
+  )
+  return data.results.map((item) => ({
+    id: item.id,
+    title: item.title ?? item.name,
+    posterPath: item.poster_path,
+    overview: item.overview,
+    releaseDate: item.release_date ?? item.first_air_date,
+    voteAverage: item.vote_average,
+    mediaType,
+  }))
+}
+
 export async function getMovieDetails(tmdbId: number): Promise<TmdbMovieDetail> {
   return get<TmdbMovieDetail>(`/movie/${tmdbId}?append_to_response=credits`)
 }

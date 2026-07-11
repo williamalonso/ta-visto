@@ -13,7 +13,6 @@ export function DetailBackButton() {
 const styles = StyleSheet.create({
   backBtn: {
     alignSelf: 'flex-start',
-    marginBottom: spacing.lg,
   },
   backText: {
     fontSize: 18,

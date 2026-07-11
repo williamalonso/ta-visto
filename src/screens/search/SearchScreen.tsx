@@ -10,16 +10,24 @@ import { TmdbResult, MediaStatus } from '@/types'
 import { colors } from '@/theme'
 import { SearchHeader } from './components/SearchHeader'
 import { SearchEmpty } from './components/SearchEmpty'
+import { TrendingSection } from './components/TrendingSection'
+import { useTrending } from './hooks/useTrending'
 
 export default function SearchScreen() {
   const { query, setQuery, mediaType, setMediaType, results, loading, error } = useSearch()
   const { exists: movieExists, add: addMovie } = useMovies()
   const { exists: seriesExists, add: addSeries } = useSeries()
+  const { movies: trendingMovies, series: trendingSeries, loading: trendingLoading } = useTrending()
   const [pendingItem, setPendingItem] = useState<TmdbResult | null>(null)
 
   const isAdded = useCallback(
     (tmdbId: number) => (mediaType === 'movie' ? movieExists(tmdbId) : seriesExists(tmdbId)),
     [mediaType, movieExists, seriesExists]
+  )
+
+  const isTrendingAdded = useCallback(
+    (tmdbId: number, type: 'movie' | 'tv') => (type === 'movie' ? movieExists(tmdbId) : seriesExists(tmdbId)),
+    [movieExists, seriesExists]
   )
 
   const handleAdd = (item: TmdbResult) => {
@@ -61,7 +69,15 @@ export default function SearchScreen() {
         onMediaTypeChange={setMediaType}
       />
 
-      {!hasQuery && <SearchEmpty message="Digite algo para buscar" />}
+      {!hasQuery && (
+        <TrendingSection
+          movies={trendingMovies}
+          series={trendingSeries}
+          loading={trendingLoading}
+          isAdded={isTrendingAdded}
+          onAdd={handleAdd}
+        />
+      )}
       {showNoResults && <SearchEmpty message="Nenhum resultado encontrado" />}
 
       {hasQuery && (loading || results.length > 0 || error !== null) && (

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
+import { router } from 'expo-router'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { getMovieDetails, getTvDetails, TmdbMovieDetail, TmdbTvDetail, TmdbCastMember } from '@/lib/tmdb'
 import { MediaItem, MediaStatus } from '@/types'
 
 export function useDetail(id: string, mediaType: string) {
-  const { movies, updateStatus: updateMovieStatus, update: updateMovie } = useMovies()
-  const { series, updateStatus: updateSeriesStatus, update: updateSeries } = useSeries()
+  const { movies, updateStatus: updateMovieStatus, update: updateMovie, remove: removeMovie } = useMovies()
+  const { series, updateStatus: updateSeriesStatus, update: updateSeries, remove: removeSeries } = useSeries()
 
   const item: MediaItem | undefined =
     mediaType === 'movie'
@@ -45,6 +46,13 @@ export function useDetail(id: string, mediaType: string) {
     const next = [...new Set([...current, ...keys])]
     if (item.mediaType === 'movie') await updateMovie(item.id, { watchedEpisodes: next })
     else await updateSeries(item.id, { watchedEpisodes: next })
+  }
+
+  const handleRemove = async () => {
+    if (!item) return
+    if (item.mediaType === 'movie') await removeMovie(item.id)
+    else await removeSeries(item.id)
+    router.back()
   }
 
   const handleUnmarkEpisodes = async (keys: string[]) => {
@@ -88,6 +96,7 @@ export function useDetail(id: string, mediaType: string) {
     handleToggleEpisode,
     handleMarkEpisodes,
     handleUnmarkEpisodes,
+    handleRemove,
     cast,
     directors,
     creators,

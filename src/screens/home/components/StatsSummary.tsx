@@ -9,9 +9,10 @@ interface Props {
   totalSeries: number
   watching: number
   completed: number
+  onCompletedPress?: () => void
 }
 
-export function StatsSummary({ loading, totalMovies, totalSeries, watching, completed }: Props) {
+export function StatsSummary({ loading, totalMovies, totalSeries, watching, completed, onCompletedPress }: Props) {
   return (
     <>
       <Text style={{ ...typography.sectionTitle, color: colors.textPrimary, marginBottom: spacing.md }}>Resumo</Text>
@@ -29,6 +30,7 @@ export function StatsSummary({ loading, totalMovies, totalSeries, watching, comp
           totalSeries={totalSeries}
           watching={watching}
           completed={completed}
+          onCompletedPress={onCompletedPress}
         />
       )}
     </>

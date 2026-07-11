@@ -7,12 +7,10 @@ import { colors, spacing, typography, radius, shadows } from '@/theme'
 
 export function ContinueWatchingCard({ item }: { item: MediaItem }) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
-  const destination = item.mediaType === 'movie' ? '/(tabs)/movies' : '/(tabs)/series'
-
   return (
     <Pressable
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-      onPress={() => router.push(destination as any)}
+      onPress={() => router.push({ pathname: '/detail/[id]', params: { id: item.id, mediaType: item.mediaType } } as any)}
     >
       {posterUrl ? (
         <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
