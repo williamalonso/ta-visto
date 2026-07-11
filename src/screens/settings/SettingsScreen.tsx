@@ -1,25 +1,17 @@
-import { View, Text, ScrollView } from 'react-native'
+import { Text, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ExportButton } from '@/components/ExportButton'
-import { ImportButton } from '@/components/ImportButton'
-import { styles } from './styles'
+import { colors, spacing, typography } from '@/theme'
+import { BackupSection } from './components/BackupSection'
 
 export default function SettingsScreen() {
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Configurações</Text>
-
-        <Text style={styles.sectionLabel}>BACKUP</Text>
-        <View style={styles.section}>
-          <ExportButton />
-          <ImportButton />
-        </View>
-
-        <Text style={styles.infoText}>
-          A importação substitui permanentemente todos os dados atuais. Exporte um backup antes de
-          importar.
-        </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={{ padding: spacing.xl, gap: spacing.xl, paddingBottom: spacing.xxxl }}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={{ ...typography.h2, color: colors.textPrimary }}>Configurações</Text>
+        <BackupSection />
       </ScrollView>
     </SafeAreaView>
   )

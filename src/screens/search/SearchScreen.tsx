@@ -1,15 +1,15 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState, useCallback } from 'react'
-import { Chip } from '@/components/Chip'
-import { SearchBar } from '@/components/SearchBar'
 import { SearchResults } from '@/components/SearchResults'
 import { StatusSelector } from '@/components/StatusSelector'
 import { useSearch } from './hooks/useSearch'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { TmdbResult, MediaStatus } from '@/types'
-import { styles } from './styles'
+import { colors } from '@/theme'
+import { SearchHeader } from './components/SearchHeader'
+import { SearchEmpty } from './components/SearchEmpty'
 
 export default function SearchScreen() {
   const { query, setQuery, mediaType, setMediaType, results, loading, error } = useSearch()
@@ -53,41 +53,20 @@ export default function SearchScreen() {
   const showNoResults = hasQuery && !loading && results.length === 0 && error === null
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Busca</Text>
-        <SearchBar
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Buscar filmes e séries..."
-        />
-        <View style={styles.chips}>
-          <Chip label="Filme" active={mediaType === 'movie'} onPress={() => setMediaType('movie')} />
-          <Chip label="Série" active={mediaType === 'tv'} onPress={() => setMediaType('tv')} />
-        </View>
-      </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
+      <SearchHeader
+        query={query}
+        onQueryChange={setQuery}
+        mediaType={mediaType}
+        onMediaTypeChange={setMediaType}
+      />
 
-      {!hasQuery && (
-        <View style={styles.emptyPrompt}>
-          <Text style={styles.emptyText}>Digite algo para buscar</Text>
-        </View>
-      )}
-
-      {showNoResults && (
-        <View style={styles.emptyPrompt}>
-          <Text style={styles.emptyText}>Nenhum resultado encontrado</Text>
-        </View>
-      )}
+      {!hasQuery && <SearchEmpty message="Digite algo para buscar" />}
+      {showNoResults && <SearchEmpty message="Nenhum resultado encontrado" />}
 
       {hasQuery && (loading || results.length > 0 || error !== null) && (
-        <View style={styles.resultsContainer}>
-          <SearchResults
-            results={results}
-            loading={loading}
-            error={error}
-            isAdded={isAdded}
-            onAdd={handleAdd}
-          />
+        <View style={{ flex: 1 }}>
+          <SearchResults results={results} loading={loading} error={error} isAdded={isAdded} onAdd={handleAdd} />
         </View>
       )}
 
