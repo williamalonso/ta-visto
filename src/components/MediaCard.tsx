@@ -125,13 +125,13 @@ const styles = StyleSheet.create({
     ...typography.auxiliary,
     fontWeight: '600',
     color: colors.textPrimary,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: spacing.sm,
     paddingTop: spacing.sm,
   },
   status: {
     ...typography.auxiliary,
     color: colors.textSecondary,
-    paddingHorizontal: spacing.xs,
+    paddingHorizontal: spacing.sm,
     paddingBottom: spacing.xs,
   },
 })
