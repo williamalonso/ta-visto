@@ -1,42 +1,53 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Modal, Pressable, ScrollView, Image, ActivityIndicator, StyleSheet, Linking } from 'react-native'
+import { View, Text, Modal, Pressable, ScrollView, Image, ActivityIndicator, StyleSheet, Linking, Platform } from 'react-native'
 import { getWatchProviders, TmdbWatchProvider, TmdbWatchProviderResult } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
 import { colors, radius, spacing, typography } from '@/theme'
 
 const LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
 
-// Web URLs — iOS/Android redirecionam pro app via Universal Links quando instalado
-const PROVIDER_URLS: Record<number, string> = {
-  8:    'https://www.netflix.com',
-  9:    'https://www.primevideo.com',
-  119:  'https://www.primevideo.com',
-  337:  'https://www.disneyplus.com',
-  118:  'https://play.max.com',
-  384:  'https://play.max.com',
-  425:  'https://play.max.com',
-  1825: 'https://play.max.com',
-  1899: 'https://play.max.com',
-  531:  'https://www.paramountplus.com',
-  307:  'https://globoplay.globo.com',
-  619:  'https://tv.apple.com',
-  350:  'https://tv.apple.com',
-  283:  'https://www.crunchyroll.com',
-  167:  'https://mubi.com',
-  39:   'https://now.com',
-  238:  'https://www.canalplus.com',
-  553:  'https://www.oldflix.com.br',
-  531:  'https://www.paramountplus.com',
-  2:    'https://tv.apple.com',
-  3:    'https://play.google.com/store/movies',
-  68:   'https://www.microsoft.com/en-us/store/movies-and-tv',
-  192:  'https://www.youtube.com',
-  10:   'https://www.amazon.com.br/gp/video/storefront',
+const PROVIDER_CONFIG: Record<number, { web: string; androidPackage?: string; iosScheme?: string }> = {
+  8:    { web: 'https://www.netflix.com',                        androidPackage: 'com.netflix.mediaclient',         iosScheme: 'nflx://' },
+  9:    { web: 'https://www.primevideo.com',                     androidPackage: 'com.amazon.avod.thirdpartyclient' },
+  119:  { web: 'https://www.primevideo.com',                     androidPackage: 'com.amazon.avod.thirdpartyclient' },
+  10:   { web: 'https://www.amazon.com.br/gp/video/storefront',  androidPackage: 'com.amazon.avod.thirdpartyclient' },
+  337:  { web: 'https://www.disneyplus.com',                     androidPackage: 'com.disney.disneyplus',           iosScheme: 'disneyplus://' },
+  118:  { web: 'https://play.max.com',                           androidPackage: 'com.hbo.hbonow',                  iosScheme: 'hbomax://' },
+  384:  { web: 'https://play.max.com',                           androidPackage: 'com.hbo.hbonow',                  iosScheme: 'hbomax://' },
+  425:  { web: 'https://play.max.com',                           androidPackage: 'com.hbo.hbonow',                  iosScheme: 'hbomax://' },
+  1825: { web: 'https://play.max.com',                           androidPackage: 'com.hbo.hbonow',                  iosScheme: 'hbomax://' },
+  1899: { web: 'https://play.max.com',                           androidPackage: 'com.hbo.hbonow',                  iosScheme: 'hbomax://' },
+  531:  { web: 'https://www.paramountplus.com',                  androidPackage: 'com.cbs.app',                     iosScheme: 'paramountplus://' },
+  307:  { web: 'https://globoplay.globo.com',                    androidPackage: 'com.globo.globoplay' },
+  619:  { web: 'https://tv.apple.com',                                                                              iosScheme: 'videos://' },
+  350:  { web: 'https://tv.apple.com',                                                                              iosScheme: 'videos://' },
+  2:    { web: 'https://tv.apple.com',                                                                              iosScheme: 'videos://' },
+  283:  { web: 'https://www.crunchyroll.com',                    androidPackage: 'com.crunchyroll.crunchyroid',     iosScheme: 'crunchyroll://' },
+  167:  { web: 'https://mubi.com',                               androidPackage: 'com.mubi',                        iosScheme: 'mubi://' },
+  39:   { web: 'https://now.com' },
+  238:  { web: 'https://www.canalplus.com' },
+  553:  { web: 'https://www.oldflix.com.br' },
+  3:    { web: 'https://play.google.com/store/movies',           androidPackage: 'com.google.android.videos' },
+  68:   { web: 'https://www.microsoft.com/en-us/store/movies-and-tv' },
+  192:  { web: 'https://www.youtube.com',                        androidPackage: 'com.google.android.youtube',     iosScheme: 'youtube://' },
 }
 
-function openProvider(providerId: number, tmdbLink: string) {
-  const url = PROVIDER_URLS[providerId] ?? tmdbLink
-  Linking.openURL(url)
+async function openProvider(providerId: number, tmdbLink: string) {
+  const config = PROVIDER_CONFIG[providerId]
+  if (!config) { Linking.openURL(tmdbLink); return }
+
+  if (Platform.OS === 'android' && config.androidPackage) {
+    const intentUrl = `intent://open#Intent;package=${config.androidPackage};scheme=https;end`
+    const can = await Linking.canOpenURL(intentUrl)
+    if (can) { Linking.openURL(intentUrl); return }
+  }
+
+  if (Platform.OS === 'ios' && config.iosScheme) {
+    const can = await Linking.canOpenURL(config.iosScheme)
+    if (can) { Linking.openURL(config.iosScheme); return }
+  }
+
+  Linking.openURL(config.web)
 }
 
 interface Props {
