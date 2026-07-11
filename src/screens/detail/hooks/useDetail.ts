@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
-import { getMovieDetails, getTvDetails, TmdbMovieDetail, TmdbTvDetail } from '@/lib/tmdb'
+import { getMovieDetails, getTvDetails, TmdbMovieDetail, TmdbTvDetail, TmdbCastMember } from '@/lib/tmdb'
 import { MediaItem, MediaStatus } from '@/types'
 
 export function useDetail(id: string, mediaType: string) {
@@ -47,6 +47,14 @@ export function useDetail(id: string, mediaType: string) {
     else await updateSeries(item.id, { watchedEpisodes: next })
   }
 
+  const handleUnmarkEpisodes = async (keys: string[]) => {
+    if (!item) return
+    const current = item.watchedEpisodes ?? []
+    const next = current.filter((k) => !keys.includes(k))
+    if (item.mediaType === 'movie') await updateMovie(item.id, { watchedEpisodes: next })
+    else await updateSeries(item.id, { watchedEpisodes: next })
+  }
+
   const genres =
     tmdbDetail && 'genres' in tmdbDetail
       ? tmdbDetail.genres.map((g) => g.name).join(', ')
@@ -60,6 +68,16 @@ export function useDetail(id: string, mediaType: string) {
   const tvDetail =
     item?.mediaType === 'tv' && tmdbDetail ? (tmdbDetail as TmdbTvDetail) : null
 
+  const cast: TmdbCastMember[] = tmdbDetail?.credits?.cast?.slice(0, 8) ?? []
+
+  const directors =
+    tmdbDetail && 'credits' in tmdbDetail
+      ? tmdbDetail.credits.crew.filter((c) => c.job === 'Director').map((c) => c.name)
+      : []
+
+  const creators =
+    tvDetail?.created_by?.map((c) => c.name) ?? []
+
   return {
     item,
     detailLoading,
@@ -69,5 +87,9 @@ export function useDetail(id: string, mediaType: string) {
     handleStatusChange,
     handleToggleEpisode,
     handleMarkEpisodes,
+    handleUnmarkEpisodes,
+    cast,
+    directors,
+    creators,
   }
 }

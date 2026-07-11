@@ -23,9 +23,12 @@ export default function HomeScreen() {
     }, [reloadMovies, reloadSeries])
   )
 
-  const allItems = [...movies, ...series].sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  )
+  const byDate = (a: { updatedAt: string }, b: { updatedAt: string }) =>
+    new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+
+  const allItems = [...movies, ...series].sort(byDate)
+  const recentMovies = [...movies].sort(byDate).slice(0, 5)
+  const recentSeries = [...series].sort(byDate).slice(0, 5)
   const watching = allItems.filter((m) => m.status === 'watching')
   const completedCount = allItems.filter((m) => m.status === 'completed').length
 
@@ -45,7 +48,8 @@ export default function HomeScreen() {
           completed={completedCount}
         />
         <ContinueWatchingSection items={watching} />
-        <RecentSection items={allItems.slice(0, 5)} />
+        <RecentSection title="Filmes Recentes" items={recentMovies} />
+        <RecentSection title="Séries Recentes" items={recentSeries} />
         {allItems.length === 0 && !loading && <HomeEmptyState />}
       </ScrollView>
     </SafeAreaView>

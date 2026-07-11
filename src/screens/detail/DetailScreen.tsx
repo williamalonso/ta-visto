@@ -9,6 +9,7 @@ import { DetailPosterInfo } from './components/DetailPosterInfo'
 import { DetailStatusCard } from './components/DetailStatusCard'
 import { DetailOverview } from './components/DetailOverview'
 import { useDetail } from './hooks/useDetail'
+import { DetailCast } from './components/DetailCast'
 import { colors, spacing } from '@/theme'
 
 export default function DetailScreen() {
@@ -24,6 +25,10 @@ export default function DetailScreen() {
     handleStatusChange,
     handleToggleEpisode,
     handleMarkEpisodes,
+    handleUnmarkEpisodes,
+    cast,
+    directors,
+    creators,
   } = useDetail(id, mediaType)
 
   if (!item) {
@@ -41,6 +46,7 @@ export default function DetailScreen() {
         <DetailPosterInfo item={item} genres={genres} runtime={runtime} detailLoading={detailLoading} />
         <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />
         {item.overview ? <DetailOverview overview={item.overview} /> : null}
+        <DetailCast cast={cast} directors={directors} creators={creators} />
         {item.mediaType === 'tv' && (
           <View style={styles.section}>
             {detailLoading ? (
@@ -52,6 +58,7 @@ export default function DetailScreen() {
                 watchedEpisodes={item.watchedEpisodes ?? []}
                 onToggleEpisode={handleToggleEpisode}
                 onMarkEpisodes={handleMarkEpisodes}
+                onUnmarkEpisodes={handleUnmarkEpisodes}
               />
             ) : null}
           </View>

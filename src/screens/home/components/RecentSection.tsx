@@ -5,14 +5,15 @@ import { colors, spacing, typography } from '@/theme'
 
 interface Props {
   items: MediaItem[]
+  title: string
 }
 
-export function RecentSection({ items }: Props) {
+export function RecentSection({ items, title }: Props) {
   if (items.length === 0) return null
 
   return (
     <>
-      <Text style={{ ...typography.sectionTitle, color: colors.textPrimary, marginBottom: spacing.md, marginTop: spacing.xxl }}>Recentes</Text>
+      <Text style={{ ...typography.sectionTitle, color: colors.textPrimary, marginBottom: spacing.md, marginTop: spacing.xxl }}>{title}</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
