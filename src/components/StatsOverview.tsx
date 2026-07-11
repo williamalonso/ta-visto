@@ -1,19 +1,24 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { colors, radius, spacing, typography, shadows } from '@/theme'
+import { LinearGradient } from 'expo-linear-gradient'
+import { colors, radius, spacing, typography } from '@/theme'
 
 interface StatCardProps {
   value: number
   label: string
-  color: string
+  gradientColors: [string, string]
 }
 
-function StatCard({ value, label, color }: StatCardProps) {
+function StatCard({ value, label, gradientColors }: StatCardProps) {
   return (
-    <View style={styles.card}>
+    <LinearGradient
+      colors={gradientColors}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.card}
+    >
       <Text style={styles.number}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
-      <View style={[styles.bar, { backgroundColor: color }]} />
-    </View>
+    </LinearGradient>
   )
 }
 
@@ -27,10 +32,10 @@ interface StatsOverviewProps {
 export function StatsOverview({ totalMovies, totalSeries, watching, completed }: StatsOverviewProps) {
   return (
     <View style={styles.grid}>
-      <StatCard value={totalMovies} label="Filmes" color={colors.primary} />
-      <StatCard value={totalSeries} label="Séries" color={colors.completed} />
-      <StatCard value={watching} label="Assistindo" color={colors.watching} />
-      <StatCard value={completed} label="Finalizados" color={colors.paused} />
+      <StatCard value={totalMovies} label="Filmes" gradientColors={['#F59E0B', '#D97706']} />
+      <StatCard value={totalSeries} label="Séries" gradientColors={['#10B981', '#059669']} />
+      <StatCard value={watching} label="Assistindo" gradientColors={['#3B82F6', '#2563EB']} />
+      <StatCard value={completed} label="Finalizados" gradientColors={['#8B5CF6', '#7C3AED']} />
     </View>
   )
 }
@@ -45,28 +50,18 @@ const styles = StyleSheet.create({
     flexBasis: '47%',
     flexGrow: 1,
     height: 84,
-    backgroundColor: colors.surface,
     borderRadius: radius.lg,
     padding: spacing.lg,
     justifyContent: 'center',
-    overflow: 'hidden',
-    ...shadows.sm,
   },
   number: {
     ...typography.statNumber,
-    color: colors.textPrimary,
+    color: colors.white,
     lineHeight: 40,
   },
   label: {
     ...typography.auxiliary,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.75)',
     marginTop: 2,
-  },
-  bar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 3,
   },
 })

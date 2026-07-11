@@ -60,7 +60,7 @@ export function StatusSelector({ visible, mediaType, onSelect, onClose }: Status
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: colors.overlay,
     justifyContent: 'flex-end',
   },
   sheet: {

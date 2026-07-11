@@ -1,20 +1,36 @@
 export const colors = {
+  // Brand
   primary: '#F59E0B',
-  primaryLight: '#FEF3C7',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textAuxiliary: '#94A3B8',
-  background: '#F5F7FA',
-  surface: '#FFFFFF',
-  border: '#E5E7EB',
-  success: '#22C55E',
-  completed: '#6366F1',
-  watching: '#22C55E',
+  primaryHover: '#D97706',
+  primaryLight: '#2A2010',
+
+  // Texto
+  textPrimary: '#F1F5F9',
+  textSecondary: '#8B92A5',
+  textAuxiliary: '#5C6070',
+
+  // Fundos
+  background: '#0F1117',
+  surface: '#1A1D27',
+  surfaceSecondary: '#252836',
+  border: '#2D3148',
+
+  // Estados
+  success: '#16A34A',
+  warning: '#F59E0B',
+  error: '#DC2626',
+
+  // Status
+  watching: '#2563EB',
+  completed: '#10B981',
   planned: '#F59E0B',
-  paused: '#F97316',
-  error: '#EF4444',
+  paused: '#64748B',
+
+  // Base
   white: '#FFFFFF',
-} as const
+  black: '#111827',
+  overlay: 'rgba(0,0,0,0.4)',
+} as const;
 
 export const radius = {
   xs: 6,
