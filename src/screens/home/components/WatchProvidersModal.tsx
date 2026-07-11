@@ -1,10 +1,38 @@
 import { useEffect, useState } from 'react'
-import { View, Text, Modal, Pressable, ScrollView, Image, ActivityIndicator, StyleSheet, Linking } from 'react-native'
+import { View, Text, Modal, Pressable, ScrollView, Image, ActivityIndicator, StyleSheet, Linking, Platform } from 'react-native'
 import { getWatchProviders, TmdbWatchProvider, TmdbWatchProviderResult } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
 import { colors, radius, spacing, typography } from '@/theme'
 
 const LOGO_BASE = 'https://image.tmdb.org/t/p/w92'
+
+const PROVIDER_DEEP_LINKS: Record<number, { ios?: string; android?: string; web: string }> = {
+  8:   { ios: 'nflx://www.netflix.com/browse',   android: 'intent://www.netflix.com/browse#Intent;package=com.netflix.mediaclient;scheme=https;end', web: 'https://www.netflix.com' },
+  119: { ios: 'aiv://aiv/home',                  android: 'intent://www.amazon.com/gp/video/storefront#Intent;package=com.amazon.avod.thirdpartyclient;scheme=https;end', web: 'https://www.primevideo.com' },
+  337: { ios: 'disneyplus://',                   android: 'intent://disneyplus.com#Intent;package=com.disney.disneyplus;scheme=https;end', web: 'https://www.disneyplus.com' },
+  1899:{ ios: 'hbomax://',                        android: 'intent://play.max.com#Intent;package=com.hbo.hbonow;scheme=https;end', web: 'https://play.max.com' },
+  531: { ios: 'paramountplus://',                android: 'intent://www.paramountplus.com#Intent;package=com.cbs.app;scheme=https;end', web: 'https://www.paramountplus.com' },
+  307: { ios: 'globoplay://',                    android: 'intent://globoplay.globo.com#Intent;package=com.globo.globoplay;scheme=https;end', web: 'https://globoplay.globo.com' },
+  619: { ios: 'videos://',                       web: 'https://tv.apple.com' },
+  283: { ios: 'crunchyroll://',                  android: 'intent://crunchyroll.com#Intent;package=com.crunchyroll.crunchyroid;scheme=https;end', web: 'https://www.crunchyroll.com' },
+  167: { ios: 'mubi://',                         web: 'https://mubi.com' },
+  39:  { web: 'https://now.com' },
+  384: { ios: 'hbomax://',                       android: 'intent://play.max.com#Intent;package=com.hbo.hbonow;scheme=https;end', web: 'https://play.max.com' },
+}
+
+function openProvider(providerId: number, tmdbLink: string) {
+  const entry = PROVIDER_DEEP_LINKS[providerId]
+  if (!entry) { Linking.openURL(tmdbLink); return }
+
+  const deepLink = Platform.OS === 'ios' ? entry.ios : Platform.OS === 'android' ? entry.android : undefined
+  if (deepLink) {
+    Linking.canOpenURL(deepLink).then((can) => {
+      Linking.openURL(can ? deepLink : entry.web)
+    })
+  } else {
+    Linking.openURL(entry.web)
+  }
+}
 
 interface Props {
   visible: boolean
@@ -21,7 +49,7 @@ function ProviderRow({ label, providers, link }: { label: string; providers: Tmd
           <Pressable
             key={p.provider_id}
             style={({ pressed }) => [styles.providerBtn, pressed && { opacity: 0.7 }]}
-            onPress={() => Linking.openURL(link)}
+            onPress={() => openProvider(p.provider_id, link)}
           >
             <Image
               source={{ uri: `${LOGO_BASE}${p.logo_path}` }}
