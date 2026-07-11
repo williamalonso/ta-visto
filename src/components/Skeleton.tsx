@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Animated, StyleSheet, DimensionValue } from 'react-native'
+import { Animated, StyleSheet, DimensionValue, Platform } from 'react-native'
 import { colors, radius } from '@/theme'
 
 interface SkeletonProps {
@@ -14,8 +14,8 @@ export function Skeleton({ width, height, borderRadius = radius.sm }: SkeletonPr
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.3, duration: 700, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: Platform.OS !== 'web' }),
+        Animated.timing(opacity, { toValue: 0.3, duration: 700, useNativeDriver: Platform.OS !== 'web' }),
       ])
     )
     anim.start()

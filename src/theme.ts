@@ -46,19 +46,27 @@ export const typography = {
   statNumber: { fontSize: 36, fontWeight: '700' as const },
 } as const
 
+import { Platform } from 'react-native'
+
 export const shadows = {
-  sm: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  md: {
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-} as const
+  sm: Platform.select({
+    web: { boxShadow: '0px 2px 4px rgba(15, 23, 42, 0.04)' },
+    default: {
+      shadowColor: '#0F172A',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.04,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+  })!,
+  md: Platform.select({
+    web: { boxShadow: '0px 3px 6px rgba(15, 23, 42, 0.06)' },
+    default: {
+      shadowColor: '#0F172A',
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+      elevation: 3,
+    },
+  })!,
+}

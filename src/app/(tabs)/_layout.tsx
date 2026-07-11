@@ -1,10 +1,10 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, type ComponentProps } from 'react'
 import { Tabs } from 'expo-router'
-import { View, Animated, StyleSheet } from 'react-native'
+import { View, Animated, StyleSheet, Platform } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import { colors, radius } from '@/theme'
 
-type SymbolName = { ios: string; android: string; web: string }
+type SymbolName = ComponentProps<typeof SymbolView>['name']
 
 function AnimatedTabIcon({ focused, iconName }: { focused: boolean; iconName: SymbolName }) {
   const bgOpacity = useRef(new Animated.Value(focused ? 1 : 0)).current
@@ -13,7 +13,7 @@ function AnimatedTabIcon({ focused, iconName }: { focused: boolean; iconName: Sy
     Animated.timing(bgOpacity, {
       toValue: focused ? 1 : 0,
       duration: 200,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
     }).start()
   }, [focused, bgOpacity])
 

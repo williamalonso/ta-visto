@@ -2,7 +2,7 @@ import { View, Text, ScrollView } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ExportButton } from '@/components/ExportButton'
 import { ImportButton } from '@/components/ImportButton'
-import { styles } from './styles'
+import { styles } from '@/screens/settings/styles'
 
 export default function SettingsScreen() {
   return (

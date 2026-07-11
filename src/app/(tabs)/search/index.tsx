@@ -5,11 +5,11 @@ import { Chip } from '@/components/Chip'
 import { SearchBar } from '@/components/SearchBar'
 import { SearchResults } from '@/components/SearchResults'
 import { StatusSelector } from '@/components/StatusSelector'
-import { useSearch } from './hooks/useSearch'
+import { useSearch } from '@/screens/search/hooks/useSearch'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { TmdbResult, MediaStatus } from '@/types'
-import { styles } from './styles'
+import { styles } from '@/screens/search/styles'
 
 export default function SearchScreen() {
   const { query, setQuery, mediaType, setMediaType, results, loading, error } = useSearch()

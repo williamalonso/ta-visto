@@ -8,7 +8,7 @@ import { MediaCard } from '@/components/MediaCard'
 import { StatusSelector } from '@/components/StatusSelector'
 import { Skeleton } from '@/components/Skeleton'
 import { MediaItem, MediaStatus } from '@/types'
-import { styles } from './styles'
+import { styles } from '@/screens/series/styles'
 
 const STATUS_FILTERS: Array<{ value: MediaStatus | 'all'; label: string }> = [
   { value: 'all', label: 'Todos' },
