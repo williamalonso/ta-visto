@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native'
+import { View, Text, Pressable, ActivityIndicator, Modal, StyleSheet } from 'react-native'
 import { useState } from 'react'
 import { TmdbTvSeason, TmdbEpisode, getSeasonDetails } from '@/lib/tmdb'
 import { colors, radius, spacing, typography } from '@/theme'
@@ -8,6 +8,7 @@ interface SeasonListProps {
   tmdbId: number
   watchedEpisodes: string[]
   onToggleEpisode: (key: string) => void
+  onMarkEpisodes: (keys: string[]) => void
 }
 
 function episodeKey(seasonNumber: number, episodeNumber: number) {
@@ -44,17 +45,54 @@ function EpisodeRow({ episode, watched, onToggle }: EpisodeRowProps) {
   )
 }
 
+interface ConfirmModalProps {
+  visible: boolean
+  count: number
+  onJustThis: () => void
+  onAllPrevious: () => void
+  onCancel: () => void
+}
+
+function ConfirmModal({ visible, count, onJustThis, onAllPrevious, onCancel }: ConfirmModalProps) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
+      <Pressable style={styles.overlay} onPress={onCancel}>
+        <Pressable style={styles.dialog} onPress={() => {}}>
+          <Text style={styles.dialogTitle}>Marcar anteriores?</Text>
+          <Text style={styles.dialogBody}>
+            Há {count} episódio(s) anteriores não assistidos. Deseja marcá-los também?
+          </Text>
+          <View style={styles.dialogActions}>
+            <Pressable style={[styles.dialogBtn, styles.dialogBtnSecondary]} onPress={onCancel}>
+              <Text style={styles.dialogBtnSecondaryText}>Cancelar</Text>
+            </Pressable>
+            <Pressable style={[styles.dialogBtn, styles.dialogBtnOutline]} onPress={onJustThis}>
+              <Text style={styles.dialogBtnOutlineText}>Só este</Text>
+            </Pressable>
+            <Pressable style={[styles.dialogBtn, styles.dialogBtnPrimary]} onPress={onAllPrevious}>
+              <Text style={styles.dialogBtnPrimaryText}>Todos + este</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  )
+}
+
 interface SeasonItemProps {
   season: TmdbTvSeason
   tmdbId: number
   watchedEpisodes: string[]
+  previousSeasons: TmdbTvSeason[]
   onToggleEpisode: (key: string) => void
+  onMarkEpisodes: (keys: string[]) => void
 }
 
-function SeasonItem({ season, tmdbId, watchedEpisodes, onToggleEpisode }: SeasonItemProps) {
+function SeasonItem({ season, tmdbId, watchedEpisodes, previousSeasons, onToggleEpisode, onMarkEpisodes }: SeasonItemProps) {
   const [expanded, setExpanded] = useState(false)
   const [episodes, setEpisodes] = useState<TmdbEpisode[] | null>(null)
   const [loading, setLoading] = useState(false)
+  const [pendingKeys, setPendingKeys] = useState<{ just: string; previous: string[] } | null>(null)
 
   const handleToggle = async () => {
     if (!expanded && !episodes) {
@@ -77,6 +115,34 @@ function SeasonItem({ season, tmdbId, watchedEpisodes, onToggleEpisode }: Season
     ).length ?? 0
 
   const label = season.season_number === 0 ? 'E' : `T${season.season_number}`
+
+  const handleEpisodePress = (ep: TmdbEpisode) => {
+    const key = episodeKey(season.season_number, ep.episode_number)
+    const watched = watchedEpisodes.includes(key)
+
+    if (watched) {
+      onToggleEpisode(key)
+      return
+    }
+
+    const inCurrentSeason = (episodes ?? [])
+      .filter((e) => e.episode_number < ep.episode_number)
+      .map((e) => episodeKey(season.season_number, e.episode_number))
+      .filter((k) => !watchedEpisodes.includes(k))
+
+    const inPreviousSeasons = previousSeasons.flatMap((s) =>
+      Array.from({ length: s.episode_count }, (_, i) => episodeKey(s.season_number, i + 1))
+    ).filter((k) => !watchedEpisodes.includes(k))
+
+    const previousUnwatched = [...inPreviousSeasons, ...inCurrentSeason]
+
+    if (previousUnwatched.length === 0) {
+      onToggleEpisode(key)
+      return
+    }
+
+    setPendingKeys({ just: key, previous: previousUnwatched })
+  }
 
   return (
     <View style={styles.seasonBlock}>
@@ -108,12 +174,8 @@ function SeasonItem({ season, tmdbId, watchedEpisodes, onToggleEpisode }: Season
               <EpisodeRow
                 key={ep.id}
                 episode={ep}
-                watched={watchedEpisodes.includes(
-                  episodeKey(season.season_number, ep.episode_number)
-                )}
-                onToggle={() =>
-                  onToggleEpisode(episodeKey(season.season_number, ep.episode_number))
-                }
+                watched={watchedEpisodes.includes(episodeKey(season.season_number, ep.episode_number))}
+                onToggle={() => handleEpisodePress(ep)}
               />
             ))
           ) : (
@@ -121,11 +183,25 @@ function SeasonItem({ season, tmdbId, watchedEpisodes, onToggleEpisode }: Season
           )}
         </View>
       )}
+
+      <ConfirmModal
+        visible={pendingKeys !== null}
+        count={pendingKeys?.previous.length ?? 0}
+        onJustThis={() => {
+          if (pendingKeys) onToggleEpisode(pendingKeys.just)
+          setPendingKeys(null)
+        }}
+        onAllPrevious={() => {
+          if (pendingKeys) onMarkEpisodes([...pendingKeys.previous, pendingKeys.just])
+          setPendingKeys(null)
+        }}
+        onCancel={() => setPendingKeys(null)}
+      />
     </View>
   )
 }
 
-export function SeasonList({ seasons, tmdbId, watchedEpisodes, onToggleEpisode }: SeasonListProps) {
+export function SeasonList({ seasons, tmdbId, watchedEpisodes, onToggleEpisode, onMarkEpisodes }: SeasonListProps) {
   const regular = seasons.filter((s) => s.season_number > 0)
   const specials = seasons.filter((s) => s.season_number === 0)
   const ordered = [...regular, ...specials]
@@ -133,13 +209,15 @@ export function SeasonList({ seasons, tmdbId, watchedEpisodes, onToggleEpisode }
   return (
     <View>
       <Text style={styles.sectionTitle}>Temporadas</Text>
-      {ordered.map((season) => (
+      {ordered.map((season, index) => (
         <SeasonItem
           key={season.id}
           season={season}
           tmdbId={tmdbId}
           watchedEpisodes={watchedEpisodes}
+          previousSeasons={ordered.slice(0, index).filter((s) => s.season_number > 0)}
           onToggleEpisode={onToggleEpisode}
+          onMarkEpisodes={onMarkEpisodes}
         />
       ))}
     </View>
@@ -251,5 +329,64 @@ const styles = StyleSheet.create({
     ...typography.auxiliary,
     color: colors.textSecondary,
     paddingVertical: spacing.sm,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xl,
+  },
+  dialog: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    width: '100%',
+    maxWidth: 380,
+    gap: spacing.md,
+  },
+  dialogTitle: {
+    ...typography.sectionTitle,
+    color: colors.textPrimary,
+  },
+  dialogBody: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  dialogActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  dialogBtn: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.sm,
+    alignItems: 'center',
+  },
+  dialogBtnSecondary: {
+    backgroundColor: colors.surfaceSecondary,
+  },
+  dialogBtnSecondaryText: {
+    ...typography.auxiliary,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  dialogBtnOutline: {
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  dialogBtnOutlineText: {
+    ...typography.auxiliary,
+    color: colors.textPrimary,
+    fontWeight: '600',
+  },
+  dialogBtnPrimary: {
+    backgroundColor: colors.primary,
+  },
+  dialogBtnPrimaryText: {
+    ...typography.auxiliary,
+    color: colors.black,
+    fontWeight: '700',
   },
 })

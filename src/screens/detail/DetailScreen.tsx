@@ -60,6 +60,14 @@ export default function DetailScreen() {
     else await updateSeries(item.id, { watchedEpisodes: next })
   }
 
+  const handleMarkEpisodes = async (keys: string[]) => {
+    if (!item) return
+    const current = item.watchedEpisodes ?? []
+    const next = [...new Set([...current, ...keys])]
+    if (item.mediaType === 'movie') await updateMovie(item.id, { watchedEpisodes: next })
+    else await updateSeries(item.id, { watchedEpisodes: next })
+  }
+
   if (!item) {
     return (
       <SafeAreaView style={styles.centered} edges={['top']}>
@@ -103,6 +111,7 @@ export default function DetailScreen() {
                 tmdbId={item.tmdbId}
                 watchedEpisodes={watchedEpisodes}
                 onToggleEpisode={handleToggleEpisode}
+                onMarkEpisodes={handleMarkEpisodes}
               />
             ) : null}
           </View>
