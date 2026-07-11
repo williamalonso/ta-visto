@@ -137,6 +137,6 @@ const styles = StyleSheet.create({
   },
   iconBg: {
     backgroundColor: colors.primaryLight,
-    borderRadius: radius.lg,
+    borderRadius: 10,
   },
 })
