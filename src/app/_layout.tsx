@@ -26,7 +26,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <View
           style={
