@@ -72,9 +72,14 @@ export function MediaCard({ item, onPress, onStatusPress, onRemove }: MediaCardP
       <Text style={styles.title} numberOfLines={2}>
         {item.title}
       </Text>
-      <Text style={styles.status} numberOfLines={1}>
-        {STATUS_LABELS[item.status]}
-      </Text>
+      <View style={styles.badgeRow}>
+        <View style={[styles.badge, { backgroundColor: `${STATUS_COLORS[item.status]}25` }]}>
+          <View style={[styles.badgeDot, { backgroundColor: STATUS_COLORS[item.status] }]} />
+          <Text style={[styles.badgeText, { color: STATUS_COLORS[item.status] }]} numberOfLines={1}>
+            {STATUS_LABELS[item.status]}
+          </Text>
+        </View>
+      </View>
     </Pressable>
   )
 }
@@ -128,10 +133,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingTop: spacing.sm,
   },
-  status: {
-    ...typography.auxiliary,
-    color: colors.textSecondary,
+  badgeRow: {
     paddingHorizontal: spacing.sm,
-    paddingBottom: spacing.xs,
+    paddingBottom: spacing.sm,
+    paddingTop: spacing.xs,
+  },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    borderRadius: radius.xs,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+    gap: 4,
+  },
+  badgeDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+  },
+  badgeText: {
+    fontSize: 9,
+    fontWeight: '600',
   },
 })
