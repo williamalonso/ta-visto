@@ -1,4 +1,4 @@
-import { View, ScrollView, ActivityIndicator, StyleSheet, Pressable } from 'react-native'
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
@@ -12,7 +12,7 @@ import { useDetail } from './hooks/useDetail'
 import { DetailCast } from './components/DetailCast'
 import { SymbolView } from 'expo-symbols'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
-import { colors, spacing } from '@/theme'
+import { colors, spacing, radius } from '@/theme'
 
 export default function DetailScreen() {
   const { id, mediaType } = useLocalSearchParams<{ id: string; mediaType: string }>()
@@ -30,6 +30,7 @@ export default function DetailScreen() {
     handleMarkEpisodes,
     handleUnmarkEpisodes,
     handleRemove,
+    handleAdd,
     isPreview,
     cast,
     directors,
@@ -61,7 +62,16 @@ export default function DetailScreen() {
           </Pressable>}
         </View>
         <DetailPosterInfo item={item} genres={genres} runtime={runtime} detailLoading={detailLoading} />
-        {!isPreview && <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />}
+        {isPreview ? (
+          <Pressable
+            style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.8 }]}
+            onPress={() => setStatusSelectorVisible(true)}
+          >
+            <Text style={styles.addBtnText}>+ Adicionar à lista</Text>
+          </Pressable>
+        ) : (
+          <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />
+        )}
         {item.overview ? <DetailOverview overview={item.overview} /> : null}
         <DetailCast cast={cast} directors={directors} creators={creators} />
         {item.mediaType === 'tv' && (
@@ -93,7 +103,8 @@ export default function DetailScreen() {
         visible={statusSelectorVisible}
         mediaType={item.mediaType}
         onSelect={async (status) => {
-          await handleStatusChange(status)
+          if (isPreview) await handleAdd(status)
+          else await handleStatusChange(status)
           setStatusSelectorVisible(false)
         }}
         onClose={() => setStatusSelectorVisible(false)}
@@ -128,5 +139,17 @@ const styles = StyleSheet.create({
   },
   section: {
     marginTop: spacing.md,
+  },
+  addBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  addBtnText: {
+    color: colors.black,
+    fontWeight: '700',
+    fontSize: 15,
   },
 })

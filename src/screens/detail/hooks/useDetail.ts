@@ -3,7 +3,7 @@ import { router } from 'expo-router'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { getMovieDetails, getTvDetails, TmdbMovieDetail, TmdbTvDetail, TmdbCastMember } from '@/lib/tmdb'
-import { MediaItem, MediaStatus } from '@/types'
+import { MediaItem, MediaStatus, TmdbResult } from '@/types'
 
 function buildPreviewItem(tmdbId: number, mediaType: 'movie' | 'tv', detail: TmdbMovieDetail | TmdbTvDetail): MediaItem {
   const isMovie = mediaType === 'movie'
@@ -26,8 +26,8 @@ function buildPreviewItem(tmdbId: number, mediaType: 'movie' | 'tv', detail: Tmd
 }
 
 export function useDetail(id: string, mediaType: string) {
-  const { movies, updateStatus: updateMovieStatus, update: updateMovie, remove: removeMovie } = useMovies()
-  const { series, updateStatus: updateSeriesStatus, update: updateSeries, remove: removeSeries } = useSeries()
+  const { movies, updateStatus: updateMovieStatus, update: updateMovie, remove: removeMovie, add: addMovie } = useMovies()
+  const { series, updateStatus: updateSeriesStatus, update: updateSeries, remove: removeSeries, add: addSeries } = useSeries()
 
   const tmdbId = Number(id)
   const isPreview = !isNaN(tmdbId) && String(tmdbId) === id
@@ -88,6 +88,24 @@ export function useDetail(id: string, mediaType: string) {
     else await updateSeries(localItem.id, { watchedEpisodes: next })
   }
 
+  const handleAdd = async (status: MediaStatus) => {
+    if (!previewItem) return
+    const base = {
+      tmdbId: previewItem.tmdbId,
+      mediaType: previewItem.mediaType,
+      title: previewItem.title,
+      posterPath: previewItem.posterPath,
+      overview: previewItem.overview,
+      releaseDate: previewItem.releaseDate,
+      voteAverage: previewItem.voteAverage,
+      status,
+      rating: null as null,
+      notes: null as null,
+    }
+    if (previewItem.mediaType === 'movie') await addMovie(base)
+    else await addSeries(base)
+  }
+
   const handleRemove = async () => {
     if (!localItem) return
     if (localItem.mediaType === 'movie') await removeMovie(localItem.id)
@@ -129,6 +147,7 @@ export function useDetail(id: string, mediaType: string) {
     handleMarkEpisodes,
     handleUnmarkEpisodes,
     handleRemove,
+    handleAdd,
     cast,
     directors,
     creators,
