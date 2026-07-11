@@ -13,7 +13,8 @@ import { SeriesEmpty } from './components/SeriesEmpty'
 
 export default function SeriesScreen() {
   const { series, loading, reload, updateStatus, remove } = useSeries()
-  const { width } = useWindowDimensions()
+  const { width: rawWidth } = useWindowDimensions()
+  const width = Math.min(rawWidth, 480)
   const cardWidth = (width - spacing.xl * 2 - spacing.md * 2) / 3
   const [filter, setFilter] = useState<MediaStatus | 'all'>('all')
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null)

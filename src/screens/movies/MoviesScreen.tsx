@@ -13,7 +13,8 @@ import { MoviesEmpty } from './components/MoviesEmpty'
 
 export default function MoviesScreen() {
   const { movies, loading, reload, updateStatus, remove } = useMovies()
-  const { width } = useWindowDimensions()
+  const { width: rawWidth } = useWindowDimensions()
+  const width = Math.min(rawWidth, 480)
   const cardWidth = (width - spacing.xl * 2 - spacing.md * 2) / 3
   const [filter, setFilter] = useState<MediaStatus | 'all'>('all')
   const [editingItem, setEditingItem] = useState<MediaItem | null>(null)
