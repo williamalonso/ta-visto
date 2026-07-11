@@ -11,8 +11,8 @@ export function BackupSection() {
         <ExportButton />
         <ImportButton />
       </View>
-      <Text style={{ ...typography.auxiliary, color: colors.textAuxiliary, textAlign: 'center', lineHeight: 18 }}>
-        A importação substitui permanentemente todos os dados atuais. Exporte um backup antes de importar.
+      <Text style={{ ...typography.auxiliary, color: colors.textAuxiliary, textAlign: 'center', lineHeight: 20 }}>
+        {'📤 Exportar — salva todos os seus filmes e séries em um arquivo no seu dispositivo.\n\n📥 Importar — carrega um arquivo exportado anteriormente e restaura seus dados.\n\n⚠️ A importação apaga tudo que está salvo atualmente. Exporte um backup antes de importar para não perder nada.'}
       </Text>
     </>
   )

@@ -1,4 +1,4 @@
-import { Pressable, View, Text, StyleSheet, ActivityIndicator, Alert } from 'react-native'
+import { Pressable, View, Text, StyleSheet, ActivityIndicator, Alert, Platform } from 'react-native'
 import { SymbolView } from 'expo-symbols'
 import { useState } from 'react'
 import { useBackup } from '@/hooks/useBackup'
@@ -12,7 +12,27 @@ export function ImportButton({ onSuccess }: ImportButtonProps) {
   const { importData } = useBackup()
   const [loading, setLoading] = useState(false)
 
-  const handlePress = () => {
+  const handlePress = async () => {
+    if (Platform.OS === 'web') {
+      // window.confirm is synchronous — preserves user gesture so file picker is allowed
+      if (!window.confirm('Isso vai substituir todos os seus dados atuais. Deseja continuar?')) return
+      setLoading(true)
+      try {
+        const result = await importData()
+        if (result === 'success') {
+          Alert.alert('Sucesso', 'Dados importados! Navegue pelas abas para ver os dados atualizados.')
+          onSuccess?.()
+        } else if (result === 'error') {
+          Alert.alert('Erro', 'Arquivo inválido ou corrompido.')
+        }
+      } catch {
+        Alert.alert('Erro', 'Não foi possível importar os dados.')
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+
     Alert.alert(
       'Importar dados',
       'Isso vai substituir todos os seus dados atuais. Deseja continuar?',
