@@ -1,58 +1,20 @@
-import { View, Text, Image, Pressable, FlatList, StyleSheet } from 'react-native'
+import { View, Text, FlatList, StyleSheet } from 'react-native'
 import { useCardWidth } from '@/hooks/useCardWidth'
 import { TmdbResult } from '@/types'
-import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { Skeleton } from './Skeleton'
-import { colors, radius, spacing, typography, shadows } from '@/theme'
-
-interface SearchResultCardProps {
-  item: TmdbResult
-  isAdded: boolean
-  onPress: () => void
-  onAdd: () => void
-}
-
-function SearchResultCard({ item, isAdded, onPress, onAdd }: SearchResultCardProps) {
-  const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
-
-  return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={onPress}
-    >
-      <View style={styles.posterContainer}>
-        {posterUrl ? (
-          <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
-        ) : (
-          <View style={styles.posterPlaceholder}>
-            <Text style={styles.placeholderEmoji}>🎬</Text>
-          </View>
-        )}
-        <Pressable
-          style={[styles.addBadge, isAdded && styles.addBadgeAdded]}
-          onPress={(e) => { e.stopPropagation?.(); if (!isAdded) onAdd() }}
-          hitSlop={6}
-        >
-          <Text style={styles.addBadgeText}>{isAdded ? '✓' : '+'}</Text>
-        </Pressable>
-      </View>
-      <Text style={styles.title} numberOfLines={1}>
-        {item.title}
-      </Text>
-    </Pressable>
-  )
-}
+import { TmdbCard } from './TmdbCard'
+import { colors, radius, spacing, typography } from '@/theme'
 
 function SkeletonCard() {
   return (
-    <View style={styles.card}>
+    <View style={styles.skeletonCard}>
       <Skeleton width="100%" height={150} borderRadius={radius.md} />
       <Skeleton width="70%" height={11} />
     </View>
   )
 }
 
-interface SearchResultsProps {
+interface Props {
   results: TmdbResult[]
   loading: boolean
   error: string | null
@@ -61,7 +23,7 @@ interface SearchResultsProps {
   onPress: (item: TmdbResult) => void
 }
 
-export function SearchResults({ results, loading, error, isAdded, onAdd, onPress }: SearchResultsProps) {
+export function SearchResults({ results, loading, error, isAdded, onAdd, onPress }: Props) {
   const cardWidth = useCardWidth()
 
   if (error) {
@@ -91,12 +53,12 @@ export function SearchResults({ results, loading, error, isAdded, onAdd, onPress
       numColumns={3}
       columnWrapperStyle={styles.row}
       contentContainerStyle={styles.listContent}
+      showsVerticalScrollIndicator={false}
       renderItem={({ item }) => (
         <View style={{ width: cardWidth }}>
-          <SearchResultCard item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} />
+          <TmdbCard item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} numberOfLines={1} />
         </View>
       )}
-      showsVerticalScrollIndicator={false}
     />
   )
 }
@@ -119,6 +81,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     padding: spacing.xl,
   },
+  skeletonCard: {
+    gap: spacing.xs,
+  },
   row: {
     gap: spacing.sm,
     paddingHorizontal: spacing.xl,
@@ -127,55 +92,5 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.md,
     paddingBottom: spacing.xxxl,
-  },
-  card: {
-    gap: spacing.xs,
-    ...shadows.sm,
-  },
-  cardPressed: {
-    opacity: 0.75,
-  },
-  posterContainer: {
-    aspectRatio: 2 / 3,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    backgroundColor: colors.border,
-  },
-  poster: {
-    width: '100%',
-    height: '100%',
-  },
-  posterPlaceholder: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderEmoji: {
-    fontSize: 20,
-  },
-  addBadge: {
-    position: 'absolute',
-    bottom: spacing.xs,
-    right: spacing.xs,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  addBadgeAdded: {
-    backgroundColor: colors.success,
-  },
-  addBadgeText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.white,
-    lineHeight: 16,
-  },
-  title: {
-    ...typography.auxiliary,
-    color: colors.textPrimary,
-    fontWeight: '500',
   },
 })

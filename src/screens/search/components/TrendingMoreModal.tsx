@@ -1,10 +1,10 @@
-import { Modal, View, Text, FlatList, Pressable, Image, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native'
+import { Modal, View, Text, FlatList, Pressable, StyleSheet, ActivityIndicator, SafeAreaView } from 'react-native'
 import { useEffect, useState } from 'react'
 import { getTrending } from '@/lib/tmdb'
 import { TmdbResult } from '@/types'
-import { POSTER_BASE_URL } from '@/lib/tmdb'
-import { colors, radius, spacing, typography, shadows } from '@/theme'
+import { colors, spacing, typography } from '@/theme'
 import { useCardWidth } from '@/hooks/useCardWidth'
+import { TmdbCard } from '@/components/TmdbCard'
 
 interface Props {
   mediaType: 'movie' | 'tv'
@@ -13,31 +13,6 @@ interface Props {
   onAdd: (item: TmdbResult) => void
   onPress: (item: TmdbResult) => void
   onClose: () => void
-}
-
-function MoreCard({ item, isAdded, onPress, onAdd }: { item: TmdbResult; isAdded: boolean; onPress: () => void; onAdd: () => void }) {
-  const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
-  return (
-    <Pressable style={({ pressed }) => [styles.card, pressed && { opacity: 0.75 }]} onPress={onPress}>
-      <View style={styles.posterContainer}>
-        {posterUrl ? (
-          <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
-        ) : (
-          <View style={[styles.poster, styles.posterPlaceholder]}>
-            <Text style={styles.placeholderEmoji}>🎬</Text>
-          </View>
-        )}
-        <Pressable
-          style={[styles.badge, isAdded && styles.badgeAdded]}
-          onPress={(e) => { e.stopPropagation?.(); if (!isAdded) onAdd() }}
-          hitSlop={6}
-        >
-          <Text style={styles.badgeText}>{isAdded ? '✓' : '+'}</Text>
-        </Pressable>
-      </View>
-      <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-    </Pressable>
-  )
 }
 
 export function TrendingMoreModal({ mediaType, visible, isAdded, onAdd, onPress, onClose }: Props) {
@@ -79,7 +54,7 @@ export function TrendingMoreModal({ mediaType, visible, isAdded, onAdd, onPress,
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <View style={{ width: cardWidth }}>
-                <MoreCard
+                <TmdbCard
                   item={item}
                   isAdded={isAdded(item.id)}
                   onPress={() => { onPress(item); onClose() }}
@@ -130,52 +105,5 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingVertical: spacing.lg,
     paddingBottom: spacing.xxxl,
-  },
-  card: {
-    gap: spacing.xs,
-    ...shadows.sm,
-  },
-  posterContainer: {
-    aspectRatio: 2 / 3,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    backgroundColor: colors.border,
-  },
-  poster: {
-    width: '100%',
-    height: '100%',
-  },
-  posterPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderEmoji: {
-    fontSize: 20,
-    color: colors.textAuxiliary,
-  },
-  badge: {
-    position: 'absolute',
-    bottom: spacing.xs,
-    right: spacing.xs,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeAdded: {
-    backgroundColor: colors.success,
-  },
-  badgeText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.white,
-    lineHeight: 16,
-  },
-  title: {
-    ...typography.auxiliary,
-    color: colors.textPrimary,
-    fontWeight: '500',
   },
 })

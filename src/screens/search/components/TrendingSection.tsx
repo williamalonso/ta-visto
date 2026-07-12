@@ -1,55 +1,15 @@
-import { View, Text, Image, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, Text, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
 import { useState } from 'react'
 import { TmdbResult } from '@/types'
-import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { colors, radius, spacing, typography } from '@/theme'
+import { TmdbCard } from '@/components/TmdbCard'
 import { TrendingMoreModal } from './TrendingMoreModal'
 
-interface TrendingCardProps {
-  item: TmdbResult
-  isAdded: boolean
-  onPress: () => void
-  onAdd: () => void
-}
+const CARD_WIDTH = 90
 
-function TrendingCard({ item, isAdded, onPress, onAdd }: TrendingCardProps) {
-  const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
-
+function SeeMoreCard({ onPress }: { onPress: () => void }) {
   return (
-    <Pressable
-      testID="trending-card"
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-      onPress={onPress}
-    >
-      <View style={styles.posterContainer}>
-        {posterUrl ? (
-          <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
-        ) : (
-          <View style={[styles.poster, styles.posterPlaceholder]}>
-            <Text style={styles.placeholderText}>?</Text>
-          </View>
-        )}
-        <Pressable
-          testID="trending-add-btn"
-          style={[styles.badge, isAdded && styles.badgeAdded]}
-          onPress={(e) => { e.stopPropagation?.(); if (!isAdded) onAdd() }}
-          hitSlop={6}
-        >
-          <Text style={styles.badgeText}>{isAdded ? '✓' : '+'}</Text>
-        </Pressable>
-      </View>
-      <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-    </Pressable>
-  )
-}
-
-interface SeeMoreCardProps {
-  onPress: () => void
-}
-
-function SeeMoreCard({ onPress }: SeeMoreCardProps) {
-  return (
-    <Pressable style={({ pressed }) => [styles.card, styles.seeMoreCard, pressed && styles.cardPressed]} onPress={onPress}>
+    <Pressable style={({ pressed }) => [styles.seeMoreCard, pressed && { opacity: 0.75 }]} onPress={onPress}>
       <View style={styles.seeMoreInner}>
         <Text style={styles.seeMoreArrow}>›</Text>
         <Text style={styles.seeMoreLabel}>Ver{'\n'}mais</Text>
@@ -76,7 +36,16 @@ function TrendingRow({ title, items, mediaType, isAdded, onPress, onAdd }: Secti
       <Text style={styles.sectionTitle}>{title}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
         {items.map((item) => (
-          <TrendingCard key={item.id} item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} />
+          <View key={item.id} style={{ width: CARD_WIDTH }}>
+            <TmdbCard
+              testID="trending-card"
+              addTestID="trending-add-btn"
+              item={item}
+              isAdded={isAdded(item.id)}
+              onPress={() => onPress(item)}
+              onAdd={() => onAdd(item)}
+            />
+          </View>
         ))}
         <SeeMoreCard onPress={() => setModalOpen(true)} />
       </ScrollView>
@@ -147,63 +116,13 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingBottom: spacing.xs,
   },
-  card: {
-    width: 90,
+  seeMoreCard: {
+    width: CARD_WIDTH,
     gap: spacing.xs,
   },
-  cardPressed: {
-    opacity: 0.75,
-  },
-  posterContainer: {
-    width: 90,
-    height: 135,
-    borderRadius: radius.md,
-    overflow: 'hidden',
-    backgroundColor: colors.border,
-  },
-  poster: {
-    width: '100%',
-    height: '100%',
-  },
-  posterPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderText: {
-    fontSize: 24,
-    color: colors.textAuxiliary,
-  },
-  badge: {
-    position: 'absolute',
-    bottom: spacing.xs,
-    right: spacing.xs,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeAdded: {
-    backgroundColor: colors.success,
-  },
-  badgeText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.white,
-    lineHeight: 16,
-  },
-  title: {
-    ...typography.auxiliary,
-    color: colors.textPrimary,
-    fontWeight: '500',
-  },
-  seeMoreCard: {
-    justifyContent: 'flex-start',
-  },
   seeMoreInner: {
-    width: 90,
-    height: 135,
+    width: CARD_WIDTH,
+    height: CARD_WIDTH * 1.5,
     borderRadius: radius.md,
     backgroundColor: colors.surface,
     borderWidth: 1,
