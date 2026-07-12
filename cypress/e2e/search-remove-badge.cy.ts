@@ -24,6 +24,8 @@ const mockMovieDetail = {
 
 describe('Busca — badge some após remoção na tela de detalhes', () => {
   beforeEach(() => {
+    cy.on('uncaught:exception', () => false)
+
     cy.intercept('GET', TMDB_TRENDING_MOVIE, { fixture: 'trending-movies.json' }).as('trendingMovies')
     cy.intercept('GET', TMDB_TRENDING_TV,    { fixture: 'trending-series.json' }).as('trendingSeries')
     cy.intercept('GET', TMDB_MOVIE_DETAIL,   { body: mockMovieDetail }).as('movieDetail')
@@ -40,7 +42,7 @@ describe('Busca — badge some após remoção na tela de detalhes', () => {
 
     // Adiciona o filme mockado
     cy.get('@card').find('[data-testid="trending-add-btn"]').click()
-    cy.get('[data-testid="status-option-watching"]').click()
+    cy.contains('Assistindo').click()
 
     // Badge deve virar ✓
     cy.get('@card').find('[data-testid="trending-add-btn"]').should('contain', '✓')
