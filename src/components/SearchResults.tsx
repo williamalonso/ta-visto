@@ -1,4 +1,5 @@
 import { View, Text, Image, Pressable, FlatList, StyleSheet } from 'react-native'
+import { useCardWidth } from '@/hooks/useCardWidth'
 import { TmdbResult } from '@/types'
 import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { Skeleton } from './Skeleton'
@@ -61,6 +62,8 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ results, loading, error, isAdded, onAdd, onPress }: SearchResultsProps) {
+  const cardWidth = useCardWidth()
+
   if (error) {
     return (
       <View style={styles.center}>
@@ -73,7 +76,7 @@ export function SearchResults({ results, loading, error, isAdded, onAdd, onPress
     return (
       <View style={styles.skeletonGrid}>
         {[0, 1, 2, 3, 4, 5].map((i) => (
-          <View key={i} style={styles.gridItem}>
+          <View key={i} style={{ width: cardWidth }}>
             <SkeletonCard />
           </View>
         ))}
@@ -89,7 +92,7 @@ export function SearchResults({ results, loading, error, isAdded, onAdd, onPress
       columnWrapperStyle={styles.row}
       contentContainerStyle={styles.listContent}
       renderItem={({ item }) => (
-        <View style={styles.gridItem}>
+        <View style={{ width: cardWidth }}>
           <SearchResultCard item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} />
         </View>
       )}
@@ -115,9 +118,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
     padding: spacing.xl,
-  },
-  gridItem: {
-    flex: 1,
   },
   row: {
     gap: spacing.sm,

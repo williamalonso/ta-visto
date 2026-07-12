@@ -21,6 +21,14 @@ export type SectionRow =
   | { type: 'header'; label: string; status: MediaStatus }
   | { type: 'cards'; items: MediaItem[]; key: string }
 
+export function chunkItems(items: MediaItem[], numColumns: number, keyPrefix: string): SectionRow[] {
+  const rows: SectionRow[] = []
+  for (let i = 0; i < items.length; i += numColumns) {
+    rows.push({ type: 'cards', items: items.slice(i, i + numColumns), key: `${keyPrefix}-${i}` })
+  }
+  return rows
+}
+
 export function buildSectionRows(items: MediaItem[], numColumns: number, sort: SortOrder = 'recent'): SectionRow[] {
   const rows: SectionRow[] = []
 

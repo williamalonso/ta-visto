@@ -54,5 +54,6 @@ const styles = StyleSheet.create({
     flex: 1,
     ...typography.body,
     color: colors.textPrimary,
+    outlineStyle: 'none',
   },
 })
