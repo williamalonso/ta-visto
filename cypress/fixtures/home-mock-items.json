@@ -1,0 +1,38 @@
+{
+  "movies": [
+    {
+      "id": "mock-movie-001",
+      "tmdbId": 999001,
+      "mediaType": "movie",
+      "title": "Filme Mock Cypress",
+      "posterPath": null,
+      "overview": "Filme usado nos testes de home.",
+      "releaseDate": "2024-01-01",
+      "voteAverage": 8.0,
+      "status": "watching",
+      "rating": null,
+      "notes": null,
+      "watchedEpisodes": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "series": [
+    {
+      "id": "mock-series-001",
+      "tmdbId": 999002,
+      "mediaType": "tv",
+      "title": "Série Mock Cypress",
+      "posterPath": null,
+      "overview": "Série usada nos testes de home.",
+      "releaseDate": "2024-03-01",
+      "voteAverage": 7.5,
+      "status": "watching",
+      "rating": null,
+      "notes": null,
+      "watchedEpisodes": [],
+      "createdAt": "2024-03-01T00:00:00.000Z",
+      "updatedAt": "2024-03-01T00:00:00.000Z"
+    }
+  ]
+}

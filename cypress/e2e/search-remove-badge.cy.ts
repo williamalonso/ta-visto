@@ -1,7 +1,7 @@
 /**
  * Cenário: na aba de Busca, deve adicionar um filme ou serie clicando no botao +, depois abre os detalhes desse filme/serie, clica na lixeira, e quando ocorrer redirect para a aba Busca novamente, o icone de checklist verde deve ser alterado novamente para o icone de + sem precisar dar F5 na pagina.
  *
- * Dados: 100% mockados via cy.intercept (sem tocar nos dados reais do usuário).
+ * Dados: 100% mockados via cy.intercept (TMDB bloqueia CORS de localhost).
  * Pré-requisito: expo web rodando em http://localhost:8081
  * Run: npm run cy:open  (ou npm run cy:run)
  */
@@ -24,7 +24,6 @@ const mockMovieDetail = {
 
 describe('Busca — badge some após remoção na tela de detalhes', () => {
   beforeEach(() => {
-    // Intercepta TMDB antes de visitar a página
     cy.intercept('GET', TMDB_TRENDING_MOVIE, { fixture: 'trending-movies.json' }).as('trendingMovies')
     cy.intercept('GET', TMDB_TRENDING_TV,    { fixture: 'trending-series.json' }).as('trendingSeries')
     cy.intercept('GET', TMDB_MOVIE_DETAIL,   { body: mockMovieDetail }).as('movieDetail')
