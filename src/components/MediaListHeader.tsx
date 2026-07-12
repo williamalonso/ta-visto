@@ -5,23 +5,22 @@ import { MediaStatus } from '@/types'
 import { SortOrder } from '@/utils/groupByStatus'
 import { colors, spacing, typography, radius } from '@/theme'
 
-const STATUS_FILTERS: Array<{ value: MediaStatus | 'all'; label: string }> = [
-  { value: 'all', label: 'Todos' },
-  { value: 'watching', label: 'Assistindo' },
-  { value: 'plan_to_watch', label: 'Pretendo' },
-  { value: 'on_hold', label: 'Pausado' },
-  { value: 'completed', label: 'Finalizado' },
-]
+interface StatusFilter {
+  value: MediaStatus | 'all'
+  label: string
+}
 
 interface Props {
+  title: string
   count: number
+  filters: StatusFilter[]
   filter: MediaStatus | 'all'
   sort: SortOrder
   onFilterChange: (filter: MediaStatus | 'all') => void
   onSortChange: (sort: SortOrder) => void
 }
 
-export function MoviesHeader({ count, filter, sort, onFilterChange, onSortChange }: Props) {
+export function MediaListHeader({ title, count, filters, filter, sort, onFilterChange, onSortChange }: Props) {
   const scrollRef = useRef<ScrollView>(null)
   const chipLayouts = useRef<Partial<Record<string, { x: number; width: number }>>>({})
   const viewportWidth = useRef(0)
@@ -37,13 +36,13 @@ export function MoviesHeader({ count, filter, sort, onFilterChange, onSortChange
   return (
     <View style={{ paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: spacing.md, gap: spacing.md }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
-        <Text style={{ ...typography.h2, color: colors.textPrimary }}>Filmes</Text>
+        <Text style={{ ...typography.h2, color: colors.textPrimary }}>{title}</Text>
         <Text style={{ ...typography.body, color: colors.textSecondary, backgroundColor: colors.border, paddingHorizontal: spacing.sm, paddingVertical: 2, borderRadius: radius.pill }}>
           {count}
         </Text>
       </View>
       <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm }} onLayout={(e) => { viewportWidth.current = e.nativeEvent.layout.width }}>
-        {STATUS_FILTERS.map((f) => (
+        {filters.map((f) => (
           <View key={f.value} onLayout={(e) => { chipLayouts.current[f.value] = { x: e.nativeEvent.layout.x, width: e.nativeEvent.layout.width } }}>
             <Chip label={f.label} active={filter === f.value} onPress={() => handleFilter(f.value)} />
           </View>

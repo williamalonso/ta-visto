@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { Skeleton } from '@/components/Skeleton'
 import { colors, spacing } from '@/theme'
 
-export function SeriesLoading() {
+export function MediaListLoading() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <View style={{ padding: spacing.xl, gap: spacing.xl }}>
