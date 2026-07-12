@@ -29,13 +29,16 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "cypress": "^15.18.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run"
   },
   "private": true
 }

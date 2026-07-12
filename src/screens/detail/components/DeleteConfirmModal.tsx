@@ -35,6 +35,7 @@ export function DeleteConfirmModal({ visible, title, onConfirm, onClose }: Props
               <Text style={styles.btnCancelText}>Cancelar</Text>
             </Pressable>
             <Pressable
+              testID="confirm-remove-btn"
               style={({ pressed }) => [styles.btn, styles.btnDelete, pressed && styles.pressed]}
               onPress={() => { onConfirm(); onClose() }}
             >

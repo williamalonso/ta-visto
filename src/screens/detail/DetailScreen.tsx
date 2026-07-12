@@ -52,6 +52,7 @@ export default function DetailScreen() {
         <View style={styles.header}>
           <DetailBackButton />
           {!isPreview && <Pressable
+            testID="detail-remove-btn"
             style={({ pressed }) => [styles.deleteBtn, pressed && { opacity: 0.6 }]}
             onPress={() => setDeleteModalVisible(true)}
           >

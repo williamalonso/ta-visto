@@ -1,6 +1,7 @@
 import { View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useState, useCallback } from 'react'
+import { useFocusEffect } from 'expo-router'
 import { router } from 'expo-router'
 import { SearchResults } from '@/components/SearchResults'
 import { StatusSelector } from '@/components/StatusSelector'
@@ -16,8 +17,15 @@ import { useTrending } from './hooks/useTrending'
 
 export default function SearchScreen() {
   const { query, setQuery, mediaType, setMediaType, results, loading, error } = useSearch()
-  const { movies, exists: movieExists, add: addMovie } = useMovies()
-  const { series, exists: seriesExists, add: addSeries } = useSeries()
+  const { movies, exists: movieExists, add: addMovie, reload: reloadMovies } = useMovies()
+  const { series, exists: seriesExists, add: addSeries, reload: reloadSeries } = useSeries()
+
+  useFocusEffect(
+    useCallback(() => {
+      reloadMovies()
+      reloadSeries()
+    }, [reloadMovies, reloadSeries])
+  )
   const { movies: trendingMovies, series: trendingSeries, loading: trendingLoading } = useTrending()
   const [pendingItem, setPendingItem] = useState<TmdbResult | null>(null)
 

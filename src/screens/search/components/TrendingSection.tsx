@@ -15,6 +15,7 @@ function TrendingCard({ item, isAdded, onPress, onAdd }: TrendingCardProps) {
 
   return (
     <Pressable
+      testID="trending-card"
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       onPress={onPress}
     >
@@ -27,6 +28,7 @@ function TrendingCard({ item, isAdded, onPress, onAdd }: TrendingCardProps) {
           </View>
         )}
         <Pressable
+          testID="trending-add-btn"
           style={[styles.badge, isAdded && styles.badgeAdded]}
           onPress={(e) => { e.stopPropagation?.(); if (!isAdded) onAdd() }}
           hitSlop={6}

@@ -1,0 +1,13 @@
+{
+  "results": [
+    {
+      "id": 999001,
+      "title": "Filme Teste Cypress",
+      "poster_path": null,
+      "overview": "Filme usado nos testes automatizados.",
+      "release_date": "2024-01-01",
+      "vote_average": 8.0
+    }
+  ],
+  "total_results": 1
+}
