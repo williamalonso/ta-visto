@@ -1,7 +1,9 @@
 import { View, Text, Image, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
+import { useState } from 'react'
 import { TmdbResult } from '@/types'
 import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { colors, radius, spacing, typography } from '@/theme'
+import { TrendingMoreModal } from './TrendingMoreModal'
 
 interface TrendingCardProps {
   item: TmdbResult
@@ -41,15 +43,33 @@ function TrendingCard({ item, isAdded, onPress, onAdd }: TrendingCardProps) {
   )
 }
 
+interface SeeMoreCardProps {
+  onPress: () => void
+}
+
+function SeeMoreCard({ onPress }: SeeMoreCardProps) {
+  return (
+    <Pressable style={({ pressed }) => [styles.card, styles.seeMoreCard, pressed && styles.cardPressed]} onPress={onPress}>
+      <View style={styles.seeMoreInner}>
+        <Text style={styles.seeMoreArrow}>›</Text>
+        <Text style={styles.seeMoreLabel}>Ver{'\n'}mais</Text>
+      </View>
+    </Pressable>
+  )
+}
+
 interface SectionProps {
   title: string
   items: TmdbResult[]
+  mediaType: 'movie' | 'tv'
   isAdded: (id: number) => boolean
   onPress: (item: TmdbResult) => void
   onAdd: (item: TmdbResult) => void
 }
 
-function TrendingRow({ title, items, isAdded, onPress, onAdd }: SectionProps) {
+function TrendingRow({ title, items, mediaType, isAdded, onPress, onAdd }: SectionProps) {
+  const [modalOpen, setModalOpen] = useState(false)
+
   if (items.length === 0) return null
   return (
     <View style={styles.section}>
@@ -58,7 +78,17 @@ function TrendingRow({ title, items, isAdded, onPress, onAdd }: SectionProps) {
         {items.map((item) => (
           <TrendingCard key={item.id} item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} />
         ))}
+        <SeeMoreCard onPress={() => setModalOpen(true)} />
       </ScrollView>
+
+      <TrendingMoreModal
+        mediaType={mediaType}
+        visible={modalOpen}
+        isAdded={isAdded}
+        onAdd={onAdd}
+        onPress={onPress}
+        onClose={() => setModalOpen(false)}
+      />
     </View>
   )
 }
@@ -84,8 +114,8 @@ export function TrendingSection({ movies, series, loading, isAdded, onAdd, onPre
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
       <Text style={styles.heading}>Em alta agora</Text>
-      <TrendingRow title="Filmes" items={movies} isAdded={(id) => isAdded(id, 'movie')} onPress={onPress} onAdd={onAdd} />
-      <TrendingRow title="Séries" items={series} isAdded={(id) => isAdded(id, 'tv')} onPress={onPress} onAdd={onAdd} />
+      <TrendingRow title="Filmes" items={movies} mediaType="movie" isAdded={(id) => isAdded(id, 'movie')} onPress={onPress} onAdd={onAdd} />
+      <TrendingRow title="Séries" items={series} mediaType="tv" isAdded={(id) => isAdded(id, 'tv')} onPress={onPress} onAdd={onAdd} />
     </ScrollView>
   )
 }
@@ -166,6 +196,32 @@ const styles = StyleSheet.create({
   title: {
     ...typography.auxiliary,
     color: colors.textPrimary,
+    fontWeight: '500',
+  },
+  seeMoreCard: {
+    justifyContent: 'flex-start',
+  },
+  seeMoreInner: {
+    width: 90,
+    height: 135,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  seeMoreArrow: {
+    fontSize: 32,
+    color: colors.primary,
+    fontWeight: '300',
+    lineHeight: 36,
+  },
+  seeMoreLabel: {
+    ...typography.auxiliary,
+    color: colors.textSecondary,
+    textAlign: 'center',
     fontWeight: '500',
   },
 })

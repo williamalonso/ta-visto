@@ -142,9 +142,9 @@ export interface TmdbSeasonDetail {
   episodes: TmdbEpisode[]
 }
 
-export async function getTrending(mediaType: 'movie' | 'tv'): Promise<TmdbResult[]> {
+export async function getTrending(mediaType: 'movie' | 'tv', page = 1): Promise<TmdbResult[]> {
   const data = await get<TmdbSearchResponse<TmdbMovieResult & TmdbSeriesResult>>(
-    `/trending/${mediaType}/week`
+    `/trending/${mediaType}/week?page=${page}`
   )
   return data.results.map((item) => ({
     id: item.id,
