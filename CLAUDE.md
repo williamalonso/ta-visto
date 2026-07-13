@@ -1,5 +1,3 @@
-@AGENTS.md
-
 # Ta Visto — Project Context for Agents
 
 ## Purpose
