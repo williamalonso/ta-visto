@@ -139,6 +139,7 @@ export function SeasonItem({
         </Pressable>
 
         <Pressable
+          testID={`season-checkbox-${season.season_number}`}
           style={({ pressed }) => [
             styles.seasonCheckbox,
             allWatched && styles.seasonCheckboxActive,

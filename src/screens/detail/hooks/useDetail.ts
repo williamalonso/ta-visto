@@ -64,9 +64,11 @@ export function useDetail(id: string, mediaType: string) {
       await updateMovieStatus(localItem.id, status)
     } else {
       if (status === 'completed' && tvDetail) {
-        const allKeys = tvDetail.seasons.flatMap((s) =>
-          Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
-        )
+        const allKeys = tvDetail.seasons
+          .filter((s) => s.season_number > 0)
+          .flatMap((s) =>
+            Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
+          )
         const merged = [...new Set([...(localItem.watchedEpisodes ?? []), ...allKeys])]
         await updateSeries(localItem.id, { status, watchedEpisodes: merged })
       } else {
@@ -77,9 +79,11 @@ export function useDetail(id: string, mediaType: string) {
 
   const autoStatusOnMark = (next: string[]): MediaStatus | null => {
     if (!tvDetail) return null
-    const allKeys = tvDetail.seasons.flatMap((s) =>
-      Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
-    )
+    const allKeys = tvDetail.seasons
+      .filter((s) => s.season_number > 0)
+      .flatMap((s) =>
+        Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
+      )
     if (allKeys.length === 0 || !allKeys.every((k) => next.includes(k))) return null
     const ended = tvDetail.status === 'Ended' || tvDetail.status === 'Canceled'
     return ended ? 'completed' : 'up_to_date'
@@ -124,6 +128,15 @@ export function useDetail(id: string, mediaType: string) {
 
   const handleAdd = async (status: MediaStatus, watchedEpisodes?: string[]) => {
     if (!previewItem) return
+    let resolvedEpisodes = watchedEpisodes
+    if (status === 'completed' && previewItem.mediaType === 'tv' && tvDetail) {
+      const allKeys = tvDetail.seasons
+        .filter((s) => s.season_number > 0)
+        .flatMap((s) =>
+          Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
+        )
+      resolvedEpisodes = [...new Set([...(watchedEpisodes ?? []), ...allKeys])]
+    }
     const base = {
       tmdbId: previewItem.tmdbId,
       mediaType: previewItem.mediaType,
@@ -135,7 +148,7 @@ export function useDetail(id: string, mediaType: string) {
       status,
       rating: null as null,
       notes: null as null,
-      ...(watchedEpisodes?.length ? { watchedEpisodes } : {}),
+      ...(resolvedEpisodes?.length ? { watchedEpisodes: resolvedEpisodes } : {}),
     }
     if (previewItem.mediaType === 'movie') await addMovie(base)
     else await addSeries(base)

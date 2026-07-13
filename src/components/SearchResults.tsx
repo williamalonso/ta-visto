@@ -56,7 +56,7 @@ export function SearchResults({ results, loading, error, isAdded, onAdd, onPress
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => (
         <View style={{ width: cardWidth }}>
-          <TmdbCard item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} numberOfLines={1} />
+          <TmdbCard item={item} isAdded={isAdded(item.id)} onPress={() => onPress(item)} onAdd={() => onAdd(item)} numberOfLines={1} addTestID={`add-btn-${item.id}`} />
         </View>
       )}
     />

@@ -1,0 +1,56 @@
+{
+  "localItem": {
+    "id": "mock-series-cy-specials",
+    "tmdbId": 999003,
+    "mediaType": "tv",
+    "title": "Série Teste Especiais",
+    "posterPath": null,
+    "overview": "Série com temporadas normais e especiais.",
+    "releaseDate": "2020-01-01",
+    "voteAverage": 8.5,
+    "status": "watching",
+    "rating": null,
+    "notes": null,
+    "watchedEpisodes": [],
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "tmdbDetail": {
+    "id": 999003,
+    "name": "Série Teste Especiais",
+    "overview": "Série com temporadas normais e especiais.",
+    "poster_path": null,
+    "first_air_date": "2020-01-01",
+    "vote_average": 8.5,
+    "number_of_seasons": 2,
+    "number_of_episodes": 7,
+    "status": "Ended",
+    "genres": [{ "id": 1, "name": "Drama" }],
+    "episode_run_time": [45],
+    "created_by": [],
+    "credits": { "cast": [], "crew": [] },
+    "seasons": [
+      {
+        "id": 9000,
+        "name": "Especiais",
+        "season_number": 0,
+        "episode_count": 2,
+        "air_date": "2020-01-01"
+      },
+      {
+        "id": 9001,
+        "name": "Temporada 1",
+        "season_number": 1,
+        "episode_count": 3,
+        "air_date": "2020-03-01"
+      },
+      {
+        "id": 9002,
+        "name": "Temporada 2",
+        "season_number": 2,
+        "episode_count": 2,
+        "air_date": "2021-03-01"
+      }
+    ]
+  }
+}

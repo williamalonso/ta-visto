@@ -8,6 +8,7 @@ import { StatusSelector } from '@/components/StatusSelector'
 import { useSearch } from './hooks/useSearch'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
+import { getTvDetails } from '@/lib/tmdb'
 import { TmdbResult, MediaStatus } from '@/types'
 import { colors } from '@/theme'
 import { SearchHeader } from './components/SearchHeader'
@@ -57,6 +58,16 @@ export default function SearchScreen() {
 
   const handleStatusSelect = async (status: MediaStatus) => {
     if (!pendingItem) return
+    let watchedEpisodes: string[] | undefined
+    if (status === 'completed' && pendingItem.mediaType === 'tv') {
+      const detail = await getTvDetails(pendingItem.id)
+      const allKeys = detail.seasons
+        .filter((s) => s.season_number > 0)
+        .flatMap((s) =>
+          Array.from({ length: s.episode_count }, (_, i) => `${s.season_number}-${i + 1}`)
+        )
+      if (allKeys.length > 0) watchedEpisodes = allKeys
+    }
     const base = {
       tmdbId: pendingItem.id,
       mediaType: pendingItem.mediaType,
@@ -68,6 +79,7 @@ export default function SearchScreen() {
       status,
       rating: null as null,
       notes: null as null,
+      ...(watchedEpisodes ? { watchedEpisodes } : {}),
     }
     if (pendingItem.mediaType === 'movie') {
       await addMovie(base)
