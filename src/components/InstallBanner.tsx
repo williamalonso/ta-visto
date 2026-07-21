@@ -41,6 +41,8 @@ export function InstallBanner() {
     setVisible(false)
   }
 
+  const [showAndroidManual, setShowAndroidManual] = useState(false)
+
   const handleInstall = async () => {
     const prompt = (window as any).__pwaInstallPrompt
     if (prompt) {
@@ -48,9 +50,11 @@ export function InstallBanner() {
       const { outcome } = await prompt.userChoice
       if (outcome === 'accepted') {
         ;(window as any).__pwaInstallPrompt = null
+        dismiss()
       }
+    } else {
+      setShowAndroidManual(true)
     }
-    dismiss()
   }
 
   if (!visible || Platform.OS !== 'web') return null
@@ -61,18 +65,22 @@ export function InstallBanner() {
         <Text style={styles.title}>Instale o Tá Visto</Text>
         {env.ios ? (
           <Text style={styles.desc}>
-            Toque em{' '}
-            <Text style={styles.highlight}>Compartilhar</Text>
+            Toque em <Text style={styles.highlight}>Compartilhar</Text>
             {' → '}
             <Text style={styles.highlight}>Adicionar à tela de início</Text>
           </Text>
+        ) : showAndroidManual ? (
+          <Text style={styles.desc}>
+            Toque no menu <Text style={styles.highlight}>⋮</Text> do Chrome{' → '}
+            <Text style={styles.highlight}>Adicionar à tela inicial</Text>
+          </Text>
         ) : (
-          <Text style={styles.desc}>Adicione à tela inicial para abrir como app</Text>
+          <Text style={styles.desc}>Abra como app, sem barra do navegador</Text>
         )}
       </View>
 
       <View style={styles.actions}>
-        {env.android && (
+        {env.android && !showAndroidManual && (
           <Pressable
             style={({ pressed }) => [styles.installBtn, pressed && { opacity: 0.8 }]}
             onPress={handleInstall}
