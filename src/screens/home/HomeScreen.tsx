@@ -10,6 +10,7 @@ import { StatsSummary } from './components/StatsSummary'
 import { ContinueWatchingSection } from './components/ContinueWatchingSection'
 import { RecentSection } from './components/RecentSection'
 import { HomeEmptyState } from './components/HomeEmptyState'
+import { InstallBanner } from '@/components/InstallBanner'
 import { CompletedModal } from './components/CompletedModal'
 import { ImportSuccessModal } from './components/ImportSuccessModal'
 import { WatchingModal } from './components/WatchingModal'
@@ -66,6 +67,7 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: spacing.xxxl }}
         showsVerticalScrollIndicator={false}
       >
+        <InstallBanner />
         <HomeHeader totalCount={allItems.length} />
 
         {spotlightItem && (

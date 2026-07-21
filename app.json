@@ -22,7 +22,15 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./src/assets/images/favicon.png"
+      "favicon": "./src/assets/images/favicon.png",
+      "name": "Tá Visto",
+      "shortName": "Tá Visto",
+      "description": "Sua lista pessoal de filmes e séries",
+      "lang": "pt-BR",
+      "themeColor": "#F59E0B",
+      "backgroundColor": "#0F1117",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       "expo-router",
