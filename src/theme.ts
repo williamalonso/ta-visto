@@ -15,16 +15,17 @@ export const colors = {
   surfaceSecondary: '#252836',
   border: '#2D3148',
 
-  // Estados
-  success: '#16A34A',
+  // Estados do sistema
+  success: '#34D399',
   warning: '#F59E0B',
   error: '#DC2626',
 
-  // Status
-  watching: '#2563EB',
-  completed: '#10B981',
-  planned: '#F59E0B',
-  paused: '#64748B',
+  // Status de mídia
+  watching: '#F97316',
+  completed: '#34D399',
+  planned: '#818CF8',
+  paused: '#A1A1AA',
+  upToDate: '#22D3EE',
 
   // Base
   white: '#FFFFFF',
@@ -62,6 +63,11 @@ export const typography = {
   statNumber: { fontSize: 36, fontWeight: '700' as const },
 } as const
 
+export const gradientColors = {
+  heroOverlay: ['transparent', 'rgba(15,17,23,0.97)'] as const,
+  cardBottom: ['transparent', 'rgba(0,0,0,0.8)'] as const,
+}
+
 import { Platform } from 'react-native'
 
 export const shadows = {
@@ -83,6 +89,26 @@ export const shadows = {
       shadowOpacity: 0.06,
       shadowRadius: 6,
       elevation: 3,
+    },
+  })!,
+  card: Platform.select({
+    web: { boxShadow: '0px 8px 24px rgba(0,0,0,0.4)' },
+    default: {
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.4,
+      shadowRadius: 24,
+      elevation: 12,
+    },
+  })!,
+  glow: Platform.select({
+    web: { boxShadow: '0 0 16px rgba(245,158,11,0.25)' },
+    default: {
+      shadowColor: '#F59E0B',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.25,
+      shadowRadius: 16,
+      elevation: 8,
     },
   })!,
 }

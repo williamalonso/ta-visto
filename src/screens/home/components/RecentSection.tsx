@@ -1,4 +1,5 @@
-import { ScrollView, Text } from 'react-native'
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
+import { router } from 'expo-router'
 import { MediaItem } from '@/types'
 import { RecentCard } from './RecentCard'
 import { colors, spacing, typography } from '@/theme'
@@ -6,14 +7,20 @@ import { colors, spacing, typography } from '@/theme'
 interface Props {
   items: MediaItem[]
   title: string
+  route: '/(tabs)/movies' | '/(tabs)/series'
 }
 
-export function RecentSection({ items, title }: Props) {
+export function RecentSection({ items, title, route }: Props) {
   if (items.length === 0) return null
 
   return (
     <>
-      <Text style={{ ...typography.sectionTitle, color: colors.textPrimary, marginBottom: spacing.md, marginTop: spacing.xxl }}>{title}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        <Pressable onPress={() => router.push(route as any)} hitSlop={8}>
+          <Text style={styles.seeAll}>Ver todos ›</Text>
+        </Pressable>
+      </View>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -26,3 +33,22 @@ export function RecentSection({ items, title }: Props) {
     </>
   )
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+    marginTop: spacing.xxl,
+  },
+  title: {
+    ...typography.sectionTitle,
+    color: colors.textPrimary,
+  },
+  seeAll: {
+    ...typography.auxiliary,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+})

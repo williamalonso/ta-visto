@@ -3,11 +3,13 @@ import { TmdbResult } from '@/types'
 const BASE_URL = 'https://api.themoviedb.org/3'
 export const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500'
 export const POSTER_LARGE_BASE_URL = 'https://image.tmdb.org/t/p/w780'
+export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w780'
 
 interface TmdbMovieResult {
   id: number
   title: string
   poster_path: string | null
+  backdrop_path: string | null
   overview: string
   release_date: string
   vote_average: number
@@ -17,6 +19,7 @@ interface TmdbSeriesResult {
   id: number
   name: string
   poster_path: string | null
+  backdrop_path: string | null
   overview: string
   first_air_date: string
   vote_average: number
@@ -53,6 +56,7 @@ export interface TmdbMovieDetail {
   title: string
   overview: string
   poster_path: string | null
+  backdrop_path: string | null
   release_date: string
   vote_average: number
   runtime: number | null
@@ -73,6 +77,7 @@ export interface TmdbTvDetail {
   name: string
   overview: string
   poster_path: string | null
+  backdrop_path: string | null
   first_air_date: string
   vote_average: number
   number_of_seasons: number
@@ -103,6 +108,7 @@ export async function searchMovies(query: string): Promise<TmdbResult[]> {
     id: m.id,
     title: m.title,
     posterPath: m.poster_path,
+    backdropPath: m.backdrop_path,
     overview: m.overview,
     releaseDate: m.release_date,
     voteAverage: m.vote_average,
@@ -118,6 +124,7 @@ export async function searchSeries(query: string): Promise<TmdbResult[]> {
     id: s.id,
     title: s.name,
     posterPath: s.poster_path,
+    backdropPath: s.backdrop_path,
     overview: s.overview,
     releaseDate: s.first_air_date,
     voteAverage: s.vote_average,
@@ -150,6 +157,7 @@ export async function getTrending(mediaType: 'movie' | 'tv', page = 1): Promise<
     id: item.id,
     title: item.title ?? item.name,
     posterPath: item.poster_path,
+    backdropPath: item.backdrop_path,
     overview: item.overview,
     releaseDate: item.release_date ?? item.first_air_date,
     voteAverage: item.vote_average,

@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect } from 'expo-router'
 import { useCallback, useState } from 'react'
@@ -12,6 +12,9 @@ import { RecentSection } from './components/RecentSection'
 import { HomeEmptyState } from './components/HomeEmptyState'
 import { CompletedModal } from './components/CompletedModal'
 import { WatchingModal } from './components/WatchingModal'
+import { WatchProvidersModal } from './components/WatchProvidersModal'
+import { SpotlightCard } from './components/SpotlightCard'
+import { MediaItem } from '@/types'
 
 export default function HomeScreen() {
   const { movies, loading: moviesLoading, reload: reloadMovies } = useMovies()
@@ -27,6 +30,7 @@ export default function HomeScreen() {
 
   const [completedVisible, setCompletedVisible] = useState(false)
   const [watchingVisible, setWatchingVisible] = useState(false)
+  const [spotlightProviderItem, setSpotlightProviderItem] = useState<MediaItem | null>(null)
 
   const byDate = (a: { updatedAt: string }, b: { updatedAt: string }) =>
     new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -41,14 +45,24 @@ export default function HomeScreen() {
   const completedSeries = series.filter((s) => s.status === 'completed').sort(byDate)
   const completedCount = completedMovies.length + completedSeries.length
 
+  const spotlightItem = watching[0] ?? null
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top']}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: spacing.xl, paddingBottom: spacing.xxxl }}
+        contentContainerStyle={{ paddingHorizontal: spacing.xl, paddingTop: spacing.xl, paddingBottom: spacing.xxxl }}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader />
+        <HomeHeader totalCount={allItems.length} />
+
+        {spotlightItem && (
+          <SpotlightCard
+            item={spotlightItem}
+            onContinue={() => setSpotlightProviderItem(spotlightItem)}
+          />
+        )}
+
         <StatsSummary
           loading={loading}
           totalMovies={movies.length}
@@ -58,11 +72,18 @@ export default function HomeScreen() {
           onWatchingPress={() => setWatchingVisible(true)}
           onCompletedPress={() => setCompletedVisible(true)}
         />
+
         <ContinueWatchingSection items={watching} />
-        <RecentSection title="Filmes Recentes" items={recentMovies} />
-        <RecentSection title="Séries Recentes" items={recentSeries} />
+        <RecentSection title="Filmes Recentes" items={recentMovies} route="/(tabs)/movies" />
+        <RecentSection title="Séries Recentes" items={recentSeries} route="/(tabs)/series" />
         {allItems.length === 0 && !loading && <HomeEmptyState />}
       </ScrollView>
+
+      <WatchProvidersModal
+        visible={!!spotlightProviderItem}
+        item={spotlightProviderItem}
+        onClose={() => setSpotlightProviderItem(null)}
+      />
 
       <WatchingModal
         visible={watchingVisible}

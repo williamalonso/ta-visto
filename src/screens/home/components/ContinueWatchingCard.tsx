@@ -1,94 +1,122 @@
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native'
+import { useRef, useState } from 'react'
+import { View, Text, Image, Pressable, StyleSheet, Animated, Platform } from 'react-native'
 import { router } from 'expo-router'
 import { SymbolView } from 'expo-symbols'
+import Reanimated, { FadeIn } from 'react-native-reanimated'
 import { POSTER_BASE_URL } from '@/lib/tmdb'
 import { MediaItem } from '@/types'
-import { colors, spacing, typography, radius, shadows } from '@/theme'
+import { colors, spacing, typography, radius } from '@/theme'
+import { Skeleton } from '@/components/Skeleton'
 
 interface Props {
   item: MediaItem
+  index?: number
   onPlayPress: () => void
 }
 
-export function ContinueWatchingCard({ item, onPlayPress }: Props) {
+export function ContinueWatchingCard({ item, index = 0, onPlayPress }: Props) {
   const posterUrl = item.posterPath ? `${POSTER_BASE_URL}${item.posterPath}` : null
+  const [loaded, setLoaded] = useState(false)
+  const imgOpacity = useRef(new Animated.Value(0)).current
+
+  const onLoad = () => {
+    setLoaded(true)
+    Animated.timing(imgOpacity, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: Platform.OS !== 'web',
+    }).start()
+  }
+
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
-      onPress={() => router.push({ pathname: '/detail/[id]', params: { id: item.id, mediaType: item.mediaType } } as any)}
-    >
-      {posterUrl ? (
-        <Image source={{ uri: posterUrl }} style={styles.poster} resizeMode="cover" />
-      ) : (
-        <View style={styles.posterPlaceholder}>
-          <Text style={styles.placeholderEmoji}>🎬</Text>
-        </View>
-      )}
-      <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={2}>{item.title}</Text>
-        <Text style={styles.type}>{item.mediaType === 'movie' ? 'Filme' : 'Série'}</Text>
-      </View>
+    <Reanimated.View entering={FadeIn.delay(index * 70).duration(350)} style={styles.wrapper}>
       <Pressable
-        style={({ pressed }) => [styles.playButton, pressed && { opacity: 0.7 }]}
-        onPress={(e) => { e.stopPropagation?.(); onPlayPress() }}
-        hitSlop={8}
+        style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+        onPress={() => router.push({ pathname: '/detail/[id]', params: { id: item.id, mediaType: item.mediaType } } as any)}
       >
-        <SymbolView
-          name={{ ios: 'play.fill', android: 'play_arrow', web: 'play_arrow' }}
-          size={14}
-          tintColor={colors.white}
-        />
+        {!loaded && <Skeleton width={120} height={180} borderRadius={radius.md} />}
+        {posterUrl ? (
+          <Animated.Image
+            source={{ uri: posterUrl }}
+            style={[styles.poster, { opacity: imgOpacity }]}
+            resizeMode="cover"
+            onLoad={onLoad}
+          />
+        ) : (
+          <View style={styles.posterPlaceholder}>
+            <Text style={styles.placeholderEmoji}>🎬</Text>
+          </View>
+        )}
+        <View style={styles.typeBadge}>
+          <Text style={styles.typeText}>{item.mediaType === 'movie' ? 'Filme' : 'Série'}</Text>
+        </View>
+        <Pressable
+          style={({ pressed }) => [styles.playButton, pressed && { opacity: 0.75 }]}
+          onPress={(e) => { e.stopPropagation?.(); onPlayPress() }}
+          hitSlop={8}
+        >
+          <SymbolView
+            name={{ ios: 'play.fill', android: 'play_arrow', web: 'play_arrow' }}
+            size={13}
+            tintColor={colors.white}
+          />
+        </Pressable>
       </Pressable>
-    </Pressable>
+    </Reanimated.View>
   )
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    marginRight: spacing.md,
+  },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: 120,
+    height: 180,
+    borderRadius: radius.md,
+    overflow: 'hidden',
     backgroundColor: colors.surface,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.md,
-    marginBottom: spacing.md,
-    ...shadows.sm,
   },
   pressed: {
-    transform: [{ scale: 0.97 }],
+    transform: [{ scale: 0.96 }],
   },
   poster: {
-    width: 48,
-    height: 72,
-    borderRadius: radius.sm,
+    width: 120,
+    height: 180,
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   posterPlaceholder: {
-    width: 48,
-    height: 72,
-    borderRadius: radius.sm,
-    backgroundColor: colors.border,
+    width: 120,
+    height: 180,
     alignItems: 'center',
     justifyContent: 'center',
   },
   placeholderEmoji: {
-    fontSize: 18,
+    fontSize: 24,
   },
-  info: {
-    flex: 1,
-    gap: spacing.xs,
+  typeBadge: {
+    position: 'absolute',
+    top: spacing.xs,
+    left: spacing.xs,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    borderRadius: radius.pill,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
   },
-  title: {
-    ...typography.cardTitle,
-    color: colors.textPrimary,
-  },
-  type: {
+  typeText: {
     ...typography.auxiliary,
-    color: colors.textSecondary,
+    color: colors.white,
+    fontWeight: '600',
   },
   playButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    position: 'absolute',
+    bottom: spacing.sm,
+    right: spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',

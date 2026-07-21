@@ -6,7 +6,7 @@ const STATUS_CONFIG: Record<MediaStatus, { label: string; color: string }> = {
   watching: { label: 'Assistindo', color: colors.watching },
   plan_to_watch: { label: 'Pretendo', color: colors.planned },
   on_hold: { label: 'Pausado', color: colors.paused },
-  up_to_date: { label: 'Em dia', color: colors.success },
+  up_to_date: { label: 'Em dia', color: colors.upToDate },
   completed: { label: 'Finalizado', color: colors.completed },
 }
 

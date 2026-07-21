@@ -21,7 +21,7 @@ const STATUS_COLORS: Record<MediaStatus, string> = {
   watching: colors.watching,
   plan_to_watch: colors.planned,
   on_hold: colors.paused,
-  up_to_date: colors.success,
+  up_to_date: colors.upToDate,
   completed: colors.completed,
 }
 

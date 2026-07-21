@@ -11,6 +11,7 @@ export interface MediaItem {
   mediaType: 'movie' | 'tv'
   title: string
   posterPath: string | null
+  backdropPath: string | null
   overview: string
   releaseDate: string
   voteAverage: number
@@ -26,6 +27,7 @@ export interface TmdbResult {
   id: number
   title: string
   posterPath: string | null
+  backdropPath: string | null
   overview: string
   releaseDate: string
   voteAverage: number

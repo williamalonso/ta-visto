@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Text } from 'react-native'
+import { FlatList, Text, View } from 'react-native'
 import { MediaItem } from '@/types'
 import { ContinueWatchingCard } from './ContinueWatchingCard'
 import { WatchProvidersModal } from './WatchProvidersModal'
@@ -16,10 +16,24 @@ export function ContinueWatchingSection({ items }: Props) {
 
   return (
     <>
-      <Text style={{ ...typography.sectionTitle, color: colors.textPrimary, marginBottom: spacing.md, marginTop: spacing.xxl }}>Continue Assistindo</Text>
-      {items.slice(0, 5).map((item) => (
-        <ContinueWatchingCard key={item.id} item={item} onPlayPress={() => setSelectedItem(item)} />
-      ))}
+      <Text style={{ ...typography.sectionTitle, color: colors.textPrimary, marginBottom: spacing.md, marginTop: spacing.xxl }}>
+        Continue Assistindo
+      </Text>
+      <FlatList
+        data={items.slice(0, 5)}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        style={{ marginHorizontal: -spacing.xl }}
+        contentContainerStyle={{ paddingHorizontal: spacing.xl }}
+        renderItem={({ item, index }) => (
+          <ContinueWatchingCard
+            item={item}
+            index={index}
+            onPlayPress={() => setSelectedItem(item)}
+          />
+        )}
+      />
       <WatchProvidersModal
         visible={!!selectedItem}
         item={selectedItem}
