@@ -10,7 +10,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
         {/* PWA */}
-        <meta name="theme-color" content="#F59E0B" />
+        <meta name="theme-color" content="#0F1117" />
         <meta name="application-name" content="Tá Visto" />
         <meta name="description" content="Sua lista pessoal de filmes e séries" />
 
