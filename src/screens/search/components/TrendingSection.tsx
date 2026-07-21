@@ -5,7 +5,7 @@ import { colors, radius, spacing, typography } from '@/theme'
 import { TmdbCard } from '@/components/TmdbCard'
 import { TrendingMoreModal } from './TrendingMoreModal'
 
-const CARD_WIDTH = 90
+const CARD_WIDTH = 110
 
 function SeeMoreCard({ onPress }: { onPress: () => void }) {
   return (

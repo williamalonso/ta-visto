@@ -133,11 +133,19 @@ const styles = StyleSheet.create({
   },
   metaText: {
     ...typography.auxiliary,
-    color: colors.textSecondary,
+    color: 'rgba(255,255,255,0.75)',
+    ...Platform.select({
+      web: { textShadow: '0px 1px 3px rgba(0,0,0,0.8)' },
+      default: {
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
+      },
+    }),
   },
   metaDot: {
     ...typography.auxiliary,
-    color: colors.textAuxiliary,
+    color: 'rgba(255,255,255,0.45)',
   },
   actions: {
     flexDirection: 'row',

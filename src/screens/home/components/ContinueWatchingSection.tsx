@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FlatList, Text, View } from 'react-native'
 import { MediaItem } from '@/types'
 import { ContinueWatchingCard } from './ContinueWatchingCard'
-import { WatchProvidersModal } from './WatchProvidersModal'
+import { WatchProvidersModal } from '@/components/WatchProvidersModal'
 import { colors, spacing, typography } from '@/theme'
 
 interface Props {

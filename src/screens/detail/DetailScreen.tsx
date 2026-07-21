@@ -1,7 +1,8 @@
 import { View, Text, ScrollView, ActivityIndicator, StyleSheet, Pressable } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useLocalSearchParams } from 'expo-router'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useFocusEffect } from 'expo-router'
 import { StatusSelector } from '@/components/StatusSelector'
 import { SeasonList } from './SeasonList'
 import { DetailBackButton } from './components/DetailBackButton'
@@ -10,15 +11,32 @@ import { DetailStatusCard } from './components/DetailStatusCard'
 import { DetailOverview } from './components/DetailOverview'
 import { useDetail } from './hooks/useDetail'
 import { DetailCast } from './components/DetailCast'
+import { DetailRecommendations } from './components/DetailRecommendations'
 import { SymbolView } from 'expo-symbols'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
-import { colors, spacing, radius } from '@/theme'
+import { WatchProvidersModal } from '@/components/WatchProvidersModal'
+import { useMovies } from '@/hooks/useMovies'
+import { useSeries } from '@/hooks/useSeries'
+import { TmdbResult } from '@/types'
+import { colors, spacing, radius, typography } from '@/theme'
 
 export default function DetailScreen() {
   const { id, mediaType } = useLocalSearchParams<{ id: string; mediaType: string }>()
   const [statusSelectorVisible, setStatusSelectorVisible] = useState(false)
   const [deleteModalVisible, setDeleteModalVisible] = useState(false)
   const [pendingEpisodeKeys, setPendingEpisodeKeys] = useState<string[] | null>(null)
+  const [pendingRecommendation, setPendingRecommendation] = useState<TmdbResult | null>(null)
+  const [watchProvidersVisible, setWatchProvidersVisible] = useState(false)
+
+  const { exists: movieExists, add: addMovie, reload: reloadMovies } = useMovies()
+  const { exists: seriesExists, add: addSeries, reload: reloadSeries } = useSeries()
+
+  useFocusEffect(
+    useCallback(() => {
+      reloadMovies()
+      reloadSeries()
+    }, [reloadMovies, reloadSeries])
+  )
 
   const {
     item,
@@ -36,7 +54,14 @@ export default function DetailScreen() {
     cast,
     directors,
     creators,
+    recommendations,
   } = useDetail(id, mediaType)
+
+  const isRecommendationAdded = useCallback(
+    (tmdbId: number) =>
+      mediaType === 'movie' ? movieExists(tmdbId) : seriesExists(tmdbId),
+    [mediaType, movieExists, seriesExists]
+  )
 
   if (!item) {
     return (
@@ -74,6 +99,22 @@ export default function DetailScreen() {
         ) : (
           <DetailStatusCard item={item} onPress={() => setStatusSelectorVisible(true)} />
         )}
+        <Pressable
+          style={({ pressed }) => [styles.watchProvidersBtn, pressed && { opacity: 0.7 }]}
+          onPress={() => setWatchProvidersVisible(true)}
+        >
+          <SymbolView
+            name={{ ios: 'play.circle', android: 'play_circle', web: 'play_circle' }}
+            size={18}
+            tintColor={colors.textSecondary}
+          />
+          <Text style={styles.watchProvidersBtnText}>Onde assistir</Text>
+          <SymbolView
+            name={{ ios: 'chevron.right', android: 'arrow_forward_ios', web: 'chevron_right' }}
+            size={14}
+            tintColor={colors.textAuxiliary}
+          />
+        </Pressable>
         {item.overview ? <DetailOverview overview={item.overview} /> : null}
         <DetailCast cast={cast} directors={directors} creators={creators} />
         {item.mediaType === 'tv' && (
@@ -106,7 +147,21 @@ export default function DetailScreen() {
             ) : null}
           </View>
         )}
+        <DetailRecommendations
+          items={recommendations}
+          isAdded={isRecommendationAdded}
+          onAdd={(rec) => {
+            setPendingRecommendation(rec)
+            setStatusSelectorVisible(true)
+          }}
+        />
       </ScrollView>
+
+      <WatchProvidersModal
+        visible={watchProvidersVisible}
+        item={item}
+        onClose={() => setWatchProvidersVisible(false)}
+      />
 
       <DeleteConfirmModal
         visible={deleteModalVisible}
@@ -117,15 +172,37 @@ export default function DetailScreen() {
 
       <StatusSelector
         visible={statusSelectorVisible}
-        mediaType={item.mediaType}
+        mediaType={pendingRecommendation?.mediaType ?? item.mediaType}
         onSelect={async (status) => {
-          if (isPreview) await handleAdd(status, pendingEpisodeKeys ?? undefined)
-          else await handleStatusChange(status)
+          if (pendingRecommendation) {
+            const rec = pendingRecommendation
+            const base = {
+              tmdbId: rec.id,
+              mediaType: rec.mediaType,
+              title: rec.title,
+              posterPath: rec.posterPath,
+              backdropPath: rec.backdropPath ?? null,
+              overview: rec.overview,
+              releaseDate: rec.releaseDate,
+              voteAverage: rec.voteAverage,
+              status,
+              rating: null as null,
+              notes: null as null,
+            }
+            if (rec.mediaType === 'movie') await addMovie(base)
+            else await addSeries(base)
+            setPendingRecommendation(null)
+          } else if (isPreview) {
+            await handleAdd(status, pendingEpisodeKeys ?? undefined)
+          } else {
+            await handleStatusChange(status)
+          }
           setPendingEpisodeKeys(null)
           setStatusSelectorVisible(false)
         }}
         onClose={() => {
           setPendingEpisodeKeys(null)
+          setPendingRecommendation(null)
           setStatusSelectorVisible(false)
         }}
       />
@@ -171,5 +248,22 @@ const styles = StyleSheet.create({
     color: colors.black,
     fontWeight: '700',
     fontSize: 15,
+  },
+  watchProvidersBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  watchProvidersBtnText: {
+    ...typography.body,
+    color: colors.textSecondary,
+    flex: 1,
   },
 })

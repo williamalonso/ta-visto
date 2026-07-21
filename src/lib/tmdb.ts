@@ -51,6 +51,18 @@ export interface TmdbCredits {
   crew: TmdbCrewMember[]
 }
 
+export interface TmdbRecommendationResult {
+  id: number
+  title?: string
+  name?: string
+  poster_path: string | null
+  backdrop_path: string | null
+  overview: string
+  release_date?: string
+  first_air_date?: string
+  vote_average: number
+}
+
 export interface TmdbMovieDetail {
   id: number
   title: string
@@ -62,6 +74,7 @@ export interface TmdbMovieDetail {
   runtime: number | null
   genres: { id: number; name: string }[]
   credits: TmdbCredits
+  recommendations?: { results: TmdbRecommendationResult[] }
 }
 
 export interface TmdbTvSeason {
@@ -88,6 +101,7 @@ export interface TmdbTvDetail {
   episode_run_time: number[]
   created_by: { id: number; name: string; profile_path: string | null }[]
   credits: TmdbCredits
+  recommendations?: { results: TmdbRecommendationResult[] }
 }
 
 async function get<T>(path: string): Promise<T> {
@@ -166,11 +180,11 @@ export async function getTrending(mediaType: 'movie' | 'tv', page = 1): Promise<
 }
 
 export async function getMovieDetails(tmdbId: number): Promise<TmdbMovieDetail> {
-  return get<TmdbMovieDetail>(`/movie/${tmdbId}?append_to_response=credits`)
+  return get<TmdbMovieDetail>(`/movie/${tmdbId}?append_to_response=credits,recommendations`)
 }
 
 export async function getTvDetails(tmdbId: number): Promise<TmdbTvDetail> {
-  return get<TmdbTvDetail>(`/tv/${tmdbId}?append_to_response=credits`)
+  return get<TmdbTvDetail>(`/tv/${tmdbId}?append_to_response=credits,recommendations`)
 }
 
 export async function getSeasonDetails(tmdbId: number, seasonNumber: number): Promise<TmdbSeasonDetail> {

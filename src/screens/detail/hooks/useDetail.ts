@@ -185,6 +185,19 @@ export function useDetail(id: string, mediaType: string) {
 
   const creators = tvDetail?.created_by?.map((c) => c.name) ?? []
 
+  const recommendations: TmdbResult[] = (tmdbDetail?.recommendations?.results ?? [])
+    .slice(0, 15)
+    .map((r) => ({
+      id: r.id,
+      title: r.title ?? r.name ?? '',
+      posterPath: r.poster_path,
+      backdropPath: r.backdrop_path,
+      overview: r.overview,
+      releaseDate: r.release_date ?? r.first_air_date ?? '',
+      voteAverage: r.vote_average,
+      mediaType: item?.mediaType ?? (mediaType as 'movie' | 'tv'),
+    }))
+
   return {
     item,
     isPreview: isPreview && !localItem,
@@ -201,5 +214,6 @@ export function useDetail(id: string, mediaType: string) {
     cast,
     directors,
     creators,
+    recommendations,
   }
 }

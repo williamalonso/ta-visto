@@ -1,7 +1,7 @@
 import { ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useFocusEffect } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { useFocusEffect, useLocalSearchParams, router } from 'expo-router'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { colors, spacing } from '@/theme'
@@ -11,8 +11,9 @@ import { ContinueWatchingSection } from './components/ContinueWatchingSection'
 import { RecentSection } from './components/RecentSection'
 import { HomeEmptyState } from './components/HomeEmptyState'
 import { CompletedModal } from './components/CompletedModal'
+import { ImportSuccessModal } from './components/ImportSuccessModal'
 import { WatchingModal } from './components/WatchingModal'
-import { WatchProvidersModal } from './components/WatchProvidersModal'
+import { WatchProvidersModal } from '@/components/WatchProvidersModal'
 import { SpotlightCard } from './components/SpotlightCard'
 import { MediaItem } from '@/types'
 
@@ -30,6 +31,17 @@ export default function HomeScreen() {
 
   const [completedVisible, setCompletedVisible] = useState(false)
   const [watchingVisible, setWatchingVisible] = useState(false)
+  const [importSuccessVisible, setImportSuccessVisible] = useState(false)
+  const { importSuccess } = useLocalSearchParams<{ importSuccess?: string }>()
+  const importSuccessShown = useRef(false)
+
+  useEffect(() => {
+    if (importSuccess === '1' && !importSuccessShown.current) {
+      importSuccessShown.current = true
+      setImportSuccessVisible(true)
+      router.setParams({ importSuccess: undefined })
+    }
+  }, [importSuccess])
   const [spotlightProviderItem, setSpotlightProviderItem] = useState<MediaItem | null>(null)
 
   const byDate = (a: { updatedAt: string }, b: { updatedAt: string }) =>
@@ -97,6 +109,11 @@ export default function HomeScreen() {
         movies={completedMovies}
         series={completedSeries}
         onClose={() => setCompletedVisible(false)}
+      />
+
+      <ImportSuccessModal
+        visible={importSuccessVisible}
+        onClose={() => setImportSuccessVisible(false)}
       />
     </SafeAreaView>
   )

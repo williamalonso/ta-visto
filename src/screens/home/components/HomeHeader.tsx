@@ -27,11 +27,13 @@ interface Props {
 export function HomeHeader({ totalCount }: Props) {
   return (
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: spacing.lg }}>
-      <View style={{ gap: 2 }}>
-        <Text style={{ ...typography.h2, color: colors.textPrimary }}>Tá Visto</Text>
-        <Text style={{ ...typography.body, color: colors.textSecondary }}>{greeting()}</Text>
+      <View style={{ gap: 4 }}>
+        <Text style={{ fontSize: 11, fontWeight: '600', letterSpacing: 1.5, color: colors.primary }}>
+          TÁ VISTO
+        </Text>
+        <Text style={{ ...typography.h2, color: colors.textPrimary }}>{greeting()}</Text>
         {totalCount > 0 && (
-          <Text style={{ ...typography.auxiliary, color: colors.textAuxiliary, marginTop: 2 }}>
+          <Text style={{ ...typography.body, color: colors.textSecondary, marginTop: 2 }}>
             {totalCount} {totalCount === 1 ? 'título' : 'títulos'} na sua lista
           </Text>
         )}
