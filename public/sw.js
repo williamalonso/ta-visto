@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ta-visto-v3'
+const CACHE_NAME = 'ta-visto-v4'
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['/', '/manifest.json'])))
@@ -7,11 +7,17 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys().then(async (keys) => {
+      const stale = keys.filter((k) => k !== CACHE_NAME)
+      await Promise.all(stale.map((k) => caches.delete(k)))
+      await self.clients.claim()
+      // Atualização de um SW antigo: recarrega as abas abertas para sair da versão em cache
+      if (stale.length > 0) {
+        const windows = await self.clients.matchAll({ type: 'window' })
+        windows.forEach((client) => client.navigate(client.url).catch(() => {}))
+      }
+    })
   )
-  self.clients.claim()
 })
 
 function networkFirst(request) {
