@@ -6,15 +6,24 @@ interface EpisodeRowProps {
   episode: TmdbEpisode
   watched: boolean
   onToggle: () => void
+  onInfo: () => void
 }
 
-export function EpisodeRow({ episode, watched, onToggle }: EpisodeRowProps) {
+export function EpisodeRow({ episode, watched, onToggle, onInfo }: EpisodeRowProps) {
   return (
     <View style={styles.episodeRow}>
       <Text style={styles.epNumber}>{episode.episode_number}</Text>
       <Text style={styles.epName} numberOfLines={2}>
         {episode.name}
       </Text>
+      <Pressable
+        testID={`episode-info-${episode.episode_number}`}
+        onPress={onInfo}
+        hitSlop={8}
+        style={({ pressed }) => [styles.infoBtn, pressed && { opacity: 0.5 }]}
+      >
+        <Text style={styles.infoIcon}>ⓘ</Text>
+      </Pressable>
       <Pressable
         style={({ pressed }) => [
           styles.watchBtn,
@@ -67,6 +76,13 @@ const styles = StyleSheet.create({
   },
   watchBtnPressed: {
     opacity: 0.7,
+  },
+  infoBtn: {
+    paddingHorizontal: spacing.xs,
+  },
+  infoIcon: {
+    fontSize: 14,
+    color: colors.textAuxiliary,
   },
   watchIcon: {
     fontSize: 14,

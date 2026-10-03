@@ -14,6 +14,15 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="application-name" content="Tá Visto" />
         <meta name="description" content="Sua lista pessoal de filmes e séries" />
 
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Tá Visto" />
+        <meta property="og:description" content="Sua lista pessoal de filmes e séries" />
+        <meta property="og:image" content="/icon.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Tá Visto" />
+        <meta name="twitter:description" content="Sua lista pessoal de filmes e séries" />
+
         {/* iOS */}
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -33,7 +42,7 @@ export default function Root({ children }: PropsWithChildren) {
               });
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js');
+                  navigator.serviceWorker.register('/sw.js').catch(function() {});
                 });
               }
             `,

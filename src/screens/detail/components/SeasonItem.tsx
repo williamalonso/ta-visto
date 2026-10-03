@@ -4,6 +4,8 @@ import { TmdbTvSeason, TmdbEpisode, getSeasonDetails } from '@/lib/tmdb'
 import { colors, radius, spacing, typography } from '@/theme'
 import { EpisodeRow } from './EpisodeRow'
 import { ConfirmPreviousModal } from './ConfirmPreviousModal'
+import { ConfirmMarkSeasonModal } from './ConfirmMarkSeasonModal'
+import { EpisodeDetailModal } from './EpisodeDetailModal'
 
 function episodeKey(seasonNumber: number, episodeNumber: number) {
   return `${seasonNumber}-${episodeNumber}`
@@ -32,6 +34,8 @@ export function SeasonItem({
   const [episodes, setEpisodes] = useState<TmdbEpisode[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [pendingKeys, setPendingKeys] = useState<{ toMark: string[]; previous: string[] } | null>(null)
+  const [confirmMarkSeason, setConfirmMarkSeason] = useState<{ keys: string[]; count: number } | null>(null)
+  const [detailEpisodeNumber, setDetailEpisodeNumber] = useState<number | null>(null)
 
   const loadEpisodes = async () => {
     if (episodes) return episodes
@@ -111,7 +115,7 @@ export function SeasonItem({
     const previousUnwatched = getPreviousSeasonUnwatched()
 
     if (previousUnwatched.length === 0) {
-      onMarkEpisodes(unwatchedInSeason)
+      setConfirmMarkSeason({ keys: unwatchedInSeason, count: unwatchedInSeason.length })
       return
     }
 
@@ -165,6 +169,7 @@ export function SeasonItem({
                 episode={ep}
                 watched={watchedEpisodes.includes(episodeKey(season.season_number, ep.episode_number))}
                 onToggle={() => handleEpisodePress(ep)}
+                onInfo={() => setDetailEpisodeNumber(ep.episode_number)}
               />
             ))
           ) : (
@@ -185,6 +190,24 @@ export function SeasonItem({
           setPendingKeys(null)
         }}
         onCancel={() => setPendingKeys(null)}
+      />
+
+      <ConfirmMarkSeasonModal
+        visible={confirmMarkSeason !== null}
+        count={confirmMarkSeason?.count ?? 0}
+        onConfirm={() => {
+          if (confirmMarkSeason) onMarkEpisodes(confirmMarkSeason.keys)
+          setConfirmMarkSeason(null)
+        }}
+        onCancel={() => setConfirmMarkSeason(null)}
+      />
+
+      <EpisodeDetailModal
+        visible={detailEpisodeNumber !== null}
+        tmdbId={tmdbId}
+        seasonNumber={season.season_number}
+        episodeNumber={detailEpisodeNumber ?? 0}
+        onClose={() => setDetailEpisodeNumber(null)}
       />
     </View>
   )

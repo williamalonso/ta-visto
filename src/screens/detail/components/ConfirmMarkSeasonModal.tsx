@@ -1,0 +1,89 @@
+import { View, Text, Pressable, Modal, StyleSheet } from 'react-native'
+import { colors, radius, spacing, typography } from '@/theme'
+
+interface Props {
+  visible: boolean
+  count: number
+  onConfirm: () => void
+  onCancel: () => void
+}
+
+export function ConfirmMarkSeasonModal({ visible, count, onConfirm, onCancel }: Props) {
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
+      <Pressable style={styles.overlay} onPress={onCancel}>
+        <Pressable style={styles.dialog} onPress={() => {}}>
+          <Text style={styles.title}>Marcar temporada?</Text>
+          <Text style={styles.body}>
+            Marcar todos os {count} episódios como assistidos?
+          </Text>
+          <View style={styles.actions}>
+            <Pressable style={[styles.btn, styles.secondary]} onPress={onCancel}>
+              <Text style={styles.secondaryText}>Cancelar</Text>
+            </Pressable>
+            <Pressable
+              testID="confirm-mark-season-btn"
+              style={[styles.btn, styles.primary]}
+              onPress={onConfirm}
+            >
+              <Text style={styles.primaryText}>Confirmar</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  )
+}
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: colors.overlay,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xl,
+  },
+  dialog: {
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    width: '100%',
+    maxWidth: 380,
+    gap: spacing.md,
+  },
+  title: {
+    ...typography.sectionTitle,
+    color: colors.textPrimary,
+  },
+  body: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  btn: {
+    flex: 1,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.sm,
+    alignItems: 'center',
+  },
+  secondary: {
+    backgroundColor: colors.surfaceSecondary,
+  },
+  secondaryText: {
+    ...typography.auxiliary,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  primary: {
+    backgroundColor: colors.primary,
+  },
+  primaryText: {
+    ...typography.auxiliary,
+    color: colors.black,
+    fontWeight: '700',
+  },
+})
