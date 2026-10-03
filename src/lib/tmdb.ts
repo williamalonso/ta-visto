@@ -4,6 +4,7 @@ const BASE_URL = 'https://api.themoviedb.org/3'
 export const POSTER_BASE_URL = 'https://image.tmdb.org/t/p/w500'
 export const POSTER_LARGE_BASE_URL = 'https://image.tmdb.org/t/p/w780'
 export const BACKDROP_BASE_URL = 'https://image.tmdb.org/t/p/w780'
+export const STILL_BASE_URL = 'https://image.tmdb.org/t/p/w300'
 
 interface TmdbMovieResult {
   id: number
@@ -154,6 +155,10 @@ export interface TmdbEpisode {
   overview: string
   air_date: string | null
   vote_average: number
+  runtime?: number | null
+  still_path?: string | null
+  guest_stars?: TmdbCastMember[]
+  crew?: TmdbCrewMember[]
 }
 
 export interface TmdbSeasonDetail {
@@ -189,6 +194,10 @@ export async function getTvDetails(tmdbId: number): Promise<TmdbTvDetail> {
 
 export async function getSeasonDetails(tmdbId: number, seasonNumber: number): Promise<TmdbSeasonDetail> {
   return get<TmdbSeasonDetail>(`/tv/${tmdbId}/season/${seasonNumber}`)
+}
+
+export async function getEpisodeDetails(tmdbId: number, seasonNumber: number, episodeNumber: number): Promise<TmdbEpisode> {
+  return get<TmdbEpisode>(`/tv/${tmdbId}/season/${seasonNumber}/episode/${episodeNumber}`)
 }
 
 export interface TmdbWatchProvider {

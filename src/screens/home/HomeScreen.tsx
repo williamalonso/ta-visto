@@ -2,6 +2,7 @@ import { ScrollView, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect, useLocalSearchParams, router } from 'expo-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
 import { colors, spacing } from '@/theme'
@@ -16,7 +17,10 @@ import { ImportSuccessModal } from './components/ImportSuccessModal'
 import { WatchingModal } from './components/WatchingModal'
 import { WatchProvidersModal } from '@/components/WatchProvidersModal'
 import { SpotlightCard } from './components/SpotlightCard'
+import { OnboardingModal } from './components/OnboardingModal'
 import { MediaItem } from '@/types'
+
+const ONBOARDING_KEY = '@cinelist:onboarding_done'
 
 export default function HomeScreen() {
   const { movies, loading: moviesLoading, reload: reloadMovies } = useMovies()
@@ -30,9 +34,22 @@ export default function HomeScreen() {
     }, [reloadMovies, reloadSeries])
   )
 
+  const [onboardingVisible, setOnboardingVisible] = useState(false)
   const [completedVisible, setCompletedVisible] = useState(false)
   const [watchingVisible, setWatchingVisible] = useState(false)
   const [importSuccessVisible, setImportSuccessVisible] = useState(false)
+
+  useEffect(() => {
+    AsyncStorage.getItem(ONBOARDING_KEY).then((val) => {
+      if (!val) setOnboardingVisible(true)
+    })
+  }, [])
+
+  const handleOnboardingClose = () => {
+    AsyncStorage.setItem(ONBOARDING_KEY, '1')
+    setOnboardingVisible(false)
+    router.push('/(tabs)/search')
+  }
   const { importSuccess } = useLocalSearchParams<{ importSuccess?: string }>()
   const importSuccessShown = useRef(false)
 
@@ -49,8 +66,8 @@ export default function HomeScreen() {
     new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
 
   const allItems = [...movies, ...series].sort(byDate)
-  const recentMovies = [...movies].sort(byDate).slice(0, 5)
-  const recentSeries = [...series].sort(byDate).slice(0, 5)
+  const recentMovies = [...movies].filter((m) => m.status === 'completed').sort(byDate).slice(0, 5)
+  const recentSeries = [...series].filter((s) => s.status === 'completed').sort(byDate).slice(0, 5)
   const watching = allItems.filter((m) => m.status === 'watching')
   const watchingMovies = movies.filter((m) => m.status === 'watching').sort(byDate)
   const watchingSeries = series.filter((s) => s.status === 'watching').sort(byDate)
@@ -88,8 +105,8 @@ export default function HomeScreen() {
         />
 
         <ContinueWatchingSection items={watching} />
-        <RecentSection title="Filmes Recentes" items={recentMovies} route="/(tabs)/movies" />
-        <RecentSection title="Séries Recentes" items={recentSeries} route="/(tabs)/series" />
+        <RecentSection title="Filmes Assistidos Recentemente" items={recentMovies} route="/(tabs)/movies" />
+        <RecentSection title="Séries Assistidas Recentemente" items={recentSeries} route="/(tabs)/series" />
         {allItems.length === 0 && !loading && <HomeEmptyState />}
       </ScrollView>
 
@@ -116,6 +133,11 @@ export default function HomeScreen() {
       <ImportSuccessModal
         visible={importSuccessVisible}
         onClose={() => setImportSuccessVisible(false)}
+      />
+
+      <OnboardingModal
+        visible={onboardingVisible}
+        onClose={handleOnboardingClose}
       />
     </SafeAreaView>
   )

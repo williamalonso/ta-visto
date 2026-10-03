@@ -95,6 +95,37 @@ npm run cy:run
 
 No painel do Cypress: **E2E Testing** → escolhe o browser → clica no arquivo de teste.
 
+## ☁️ Deploy na Vercel
+
+O app compila para site estático via Expo e pode ser hospedado na Vercel.
+
+**Deploy automático (recomendado):**
+
+1. Importe o repositório na [Vercel](https://vercel.com/new)
+2. Configure as variáveis de ambiente:
+   - `EXPO_PUBLIC_TMDB_API_KEY` — sua chave da API TMDB
+3. Defina as opções de build:
+   - **Build Command:** `npx expo export --platform web`
+   - **Output Directory:** `dist`
+4. Clique em **Deploy**
+
+O arquivo `vercel.json` já está configurado com os rewrites necessários para o roteamento SPA funcionar corretamente.
+
+**Deploy manual via CLI:**
+
+```bash
+# Instala a CLI da Vercel
+npm i -g vercel
+
+# Gera o build estático
+npx expo export --platform web
+
+# Faz o deploy
+vercel dist --prod
+```
+
+> **Nota:** Como o app usa `AsyncStorage`, os dados ficam no navegador do usuário (localStorage). Cada dispositivo/navegador tem sua própria lista — use a função de backup para migrar dados entre dispositivos.
+
 ## 💾 Backup
 
 Na aba **Configurações**, é possível exportar todos os dados como um arquivo `.json` e importá-los em outro dispositivo. A importação sobrescreve os dados existentes — um alerta de confirmação é exibido antes.
