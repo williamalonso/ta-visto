@@ -6,25 +6,25 @@ interface EpisodeRowProps {
   episode: TmdbEpisode
   watched: boolean
   onToggle: () => void
+  /** Toque no número/nome do episódio — abre os detalhes */
   onInfo: () => void
 }
 
 export function EpisodeRow({ episode, watched, onToggle, onInfo }: EpisodeRowProps) {
   return (
     <View style={styles.episodeRow}>
-      <Text style={styles.epNumber}>{episode.episode_number}</Text>
-      <Text style={styles.epName} numberOfLines={2}>
-        {episode.name}
-      </Text>
       <Pressable
-        testID={`episode-info-${episode.episode_number}`}
+        testID={`episode-name-${episode.episode_number}`}
         onPress={onInfo}
-        hitSlop={8}
-        style={({ pressed }) => [styles.infoBtn, pressed && { opacity: 0.5 }]}
+        style={({ pressed }) => [styles.epInfo, pressed && styles.epInfoPressed]}
       >
-        <Text style={styles.infoIcon}>ⓘ</Text>
+        <Text style={styles.epNumber}>{episode.episode_number}</Text>
+        <Text style={styles.epName} numberOfLines={2}>
+          {episode.name}
+        </Text>
       </Pressable>
       <Pressable
+        testID={`episode-check-${episode.episode_number}`}
         style={({ pressed }) => [
           styles.watchBtn,
           watched && styles.watchBtnActive,
@@ -49,6 +49,15 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+  },
+  epInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  epInfoPressed: {
+    opacity: 0.6,
   },
   epNumber: {
     width: 24,
@@ -76,13 +85,6 @@ const styles = StyleSheet.create({
   },
   watchBtnPressed: {
     opacity: 0.7,
-  },
-  infoBtn: {
-    paddingHorizontal: spacing.xs,
-  },
-  infoIcon: {
-    fontSize: 14,
-    color: colors.textAuxiliary,
   },
   watchIcon: {
     fontSize: 14,

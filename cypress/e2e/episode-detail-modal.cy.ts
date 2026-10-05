@@ -1,6 +1,6 @@
 /**
- * Cenário: clicar no ícone ⓘ de um episódio abre um modal com os detalhes do episódio
- * (sinopse, data, duração, nota). O tap normal no episódio ainda marca/desmarca sem abrir modal.
+ * Cenário: clicar no nome de um episódio abre um modal com os detalhes do episódio
+ * (sinopse, data, duração, nota). O tap no círculo à direita marca/desmarca sem abrir modal.
  *
  * Dados: TMDB mockado via cy.intercept.
  * Pré-requisito: expo web rodando em http://localhost:8081
@@ -54,15 +54,15 @@ describe('Modal de detalhes do episódio', () => {
 
     cy.visit(`/detail/${fixture.localItem.id}?mediaType=tv`)
     cy.wait('@tvDetail')
-    cy.contains(fixture.localItem.title, { timeout: 10000 }).should('be.visible')
+    cy.contains('Alterar', { timeout: 10000 }).should('be.visible')
 
     cy.contains('Temporada 1').click()
     cy.wait('@season1')
     cy.contains('Episódio Piloto').should('be.visible')
   })
 
-  it('abre o modal ao clicar no ícone ⓘ do episódio', () => {
-    cy.get('[data-testid="episode-info-1"]').click()
+  it('abre o modal ao clicar no nome do episódio', () => {
+    cy.get('[data-testid="episode-name-1"]').click()
     cy.wait('@epDetail')
 
     cy.contains('T1 · E1').should('be.visible')
@@ -74,17 +74,17 @@ describe('Modal de detalhes do episódio', () => {
   })
 
   it('fecha o modal ao clicar fora', () => {
-    cy.get('[data-testid="episode-info-1"]').click()
+    cy.get('[data-testid="episode-name-1"]').click()
     cy.wait('@epDetail')
     cy.contains('A história começa aqui').should('be.visible')
 
-    cy.get('body').click(10, 10)
+    cy.get('[data-testid="episode-detail-overlay"]').click('top')
 
     cy.contains('A história começa aqui').should('not.exist')
   })
 
-  it('tap normal no episódio marca/desmarca sem abrir modal', () => {
-    cy.contains('Episódio Piloto').click()
+  it('tap no círculo marca/desmarca sem abrir modal', () => {
+    cy.get('[data-testid="episode-check-1"]').click()
 
     cy.contains('A história começa aqui').should('not.exist')
 

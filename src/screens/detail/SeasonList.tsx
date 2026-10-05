@@ -10,9 +10,10 @@ interface SeasonListProps {
   onToggleEpisode: (key: string) => void
   onMarkEpisodes: (keys: string[]) => void
   onUnmarkEpisodes: (keys: string[]) => void
+  onReplaceEpisodes: (remove: string[], add: string[]) => void
 }
 
-export function SeasonList({ seasons, tmdbId, watchedEpisodes, onToggleEpisode, onMarkEpisodes, onUnmarkEpisodes }: SeasonListProps) {
+export function SeasonList({ seasons, tmdbId, watchedEpisodes, onToggleEpisode, onMarkEpisodes, onUnmarkEpisodes, onReplaceEpisodes }: SeasonListProps) {
   const regular = seasons.filter((s) => s.season_number > 0)
   const specials = seasons.filter((s) => s.season_number === 0)
   const ordered = [...regular, ...specials]
@@ -30,6 +31,7 @@ export function SeasonList({ seasons, tmdbId, watchedEpisodes, onToggleEpisode, 
           onToggleEpisode={onToggleEpisode}
           onMarkEpisodes={onMarkEpisodes}
           onUnmarkEpisodes={onUnmarkEpisodes}
+          onReplaceEpisodes={onReplaceEpisodes}
         />
       ))}
     </View>

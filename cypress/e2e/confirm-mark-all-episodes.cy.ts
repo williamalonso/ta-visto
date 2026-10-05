@@ -3,7 +3,7 @@
  * um modal de confirmação "Marcar temporada?" deve aparecer.
  *  - Cancelar → não marca nada
  *  - Confirmar → todos os episódios da temporada são marcados
- *  - Desmarcar (quando já tudo marcado) → desmarca diretamente, sem modal
+ *  - Desmarcar (quando já tudo marcado) → modal "Desmarcar temporada?"
  *
  * Dados: fixture series-with-specials.json, apenas T1 usada (sem temporadas anteriores).
  * Pré-requisito: expo web rodando em http://localhost:8081
@@ -41,7 +41,7 @@ describe('Modal "Marcar temporada?"', () => {
 
     cy.visit(`/detail/${fixture.localItem.id}?mediaType=tv`)
     cy.wait('@tvDetail')
-    cy.contains(fixture.localItem.title, { timeout: 10000 }).should('be.visible')
+    cy.contains('Alterar', { timeout: 10000 }).should('be.visible')
   })
 
   it('abre o modal ao clicar no checkbox da T1 (sem temporadas anteriores)', () => {
@@ -84,7 +84,7 @@ describe('Modal "Marcar temporada?"', () => {
     })
   })
 
-  it('desmarcar temporada já completa não abre modal', () => {
+  it('desmarcar temporada já completa pede confirmação', () => {
     // Marca tudo primeiro via localStorage
     cy.window().then((win) => {
       const item = { ...fixture.localItem, watchedEpisodes: ['1-1', '1-2', '1-3'] }
@@ -96,6 +96,16 @@ describe('Modal "Marcar temporada?"', () => {
     cy.get('[data-testid="season-checkbox-1"]').should('contain', '✓').click()
 
     cy.contains('Marcar temporada?').should('not.exist')
+    cy.contains('Desmarcar temporada?').should('be.visible')
+
+    // Cancelar mantém tudo marcado
+    cy.contains('Cancelar').click()
+    cy.contains('Desmarcar temporada?').should('not.exist')
+    cy.get('[data-testid="season-checkbox-1"]').should('contain', '✓')
+
+    // Confirmar desmarca
+    cy.get('[data-testid="season-checkbox-1"]').click()
+    cy.get('[data-testid="confirm-mark-season-btn"]').click()
     cy.window().then((win) => {
       const series = JSON.parse(win.localStorage.getItem(SERIES_KEY) || '[]')
       const saved = series.find((s: any) => s.id === fixture.localItem.id)
