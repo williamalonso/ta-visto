@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ta-visto-v3'
+const CACHE_NAME = 'ta-visto-v4'
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(['/', '/manifest.json'])))
@@ -7,14 +7,34 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys().then(async (keys) => {
+      const stale = keys.filter((k) => k !== CACHE_NAME)
+      await Promise.all(stale.map((k) => caches.delete(k)))
+      await self.clients.claim()
+      // Atualização de um SW antigo: recarrega as abas abertas para sair da versão em cache
+      if (stale.length > 0) {
+        const windows = await self.clients.matchAll({ type: 'window' })
+        windows.forEach((client) => client.navigate(client.url).catch(() => {}))
+      }
+    })
   )
-  self.clients.claim()
 })
 
+function networkFirst(request) {
+  return fetch(request)
+    .then((response) => {
+      if (response.ok) {
+        const clone = response.clone()
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone))
+      }
+      return response
+    })
+    .catch(() => caches.match(request).then((cached) => cached || caches.match('/')))
+}
+
 self.addEventListener('fetch', (e) => {
+  if (e.request.method !== 'GET') return
+
   const url = new URL(e.request.url)
 
   // Network-first para TMDB API e imagens
@@ -23,41 +43,25 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  if (e.request.method !== 'GET') return
+  if (url.origin !== self.location.origin) return
 
-  // Network-first para HTML e qualquer arquivo sem hash no nome (index, manifest, bundle de dev).
-  // Cache-first aqui deixava o app preso na versão antiga após um deploy.
-  const isHashedAsset = url.pathname.startsWith('/_expo/static/') || url.pathname.startsWith('/assets/')
-  if (url.origin !== self.location.origin || !isHashedAsset) {
+  // Cache-first apenas para bundles com hash (imutáveis entre deploys)
+  if (url.pathname.startsWith('/_expo/static/')) {
     e.respondWith(
-      fetch(e.request)
-        .then((response) => {
-          if (response.ok && url.origin === self.location.origin) {
+      caches.match(e.request).then((cached) => {
+        if (cached) return cached
+        return fetch(e.request).then((response) => {
+          if (response.ok) {
             const clone = response.clone()
             caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone))
           }
           return response
         })
-        .catch(() =>
-          caches.match(e.request).then((cached) =>
-            cached ?? (e.request.mode === 'navigate' ? caches.match('/') : Response.error())
-          )
-        )
+      })
     )
     return
   }
 
-  // Cache-first para assets com hash no nome (imutáveis)
-  e.respondWith(
-    caches.match(e.request).then((cached) => {
-      if (cached) return cached
-      return fetch(e.request).then((response) => {
-        if (response.ok && e.request.method === 'GET') {
-          const clone = response.clone()
-          caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone))
-        }
-        return response
-      })
-    })
-  )
+  // Network-first para HTML e demais arquivos — garante que novos deploys apareçam
+  e.respondWith(networkFirst(e.request))
 })

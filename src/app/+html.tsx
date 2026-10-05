@@ -91,6 +91,18 @@ export default function Root({ children }: PropsWithChildren) {
                 window.addEventListener('load', function() {
                   navigator.serviceWorker.register('/sw.js').catch(function() {});
                 });
+                // PWA retomado do segundo plano não navega: verifica se há deploy novo
+                var lastCheck = Date.now();
+                document.addEventListener('visibilitychange', function() {
+                  if (document.visibilityState !== 'visible' || Date.now() - lastCheck < 60000) return;
+                  lastCheck = Date.now();
+                  navigator.serviceWorker.getRegistration().then(function(reg) { if (reg) reg.update(); });
+                  var current = document.querySelector('script[src*="/_expo/static/js/"]');
+                  if (!current) return;
+                  fetch('/', { cache: 'no-store' }).then(function(r) { return r.text(); }).then(function(html) {
+                    if (html.indexOf(current.getAttribute('src')) === -1) location.reload();
+                  }).catch(function() {});
+                });
               }
             `,
           }}
