@@ -43,4 +43,22 @@ describe('Open Graph meta tags', () => {
       .invoke('attr', 'content')
       .should('not.be.empty')
   })
+
+  it('contém og:url, twitter:image e dimensões da imagem', () => {
+    cy.get('meta[property="og:url"]').invoke('attr', 'content').should('not.be.empty')
+    cy.get('meta[name="twitter:image"]').invoke('attr', 'content').should('match', /icon\.png$/)
+    cy.get('meta[property="og:image:width"]').should('have.attr', 'content', '1254')
+    cy.get('meta[property="og:image:height"]').should('have.attr', 'content', '1254')
+  })
+
+  // WhatsApp só mostra a imagem com URL absoluta. Em dev a variável costuma não existir,
+  // então este teste só roda com: npx cypress run --env SITE_URL=https://seu-app.vercel.app
+  it('og:image e og:url são absolutas quando EXPO_PUBLIC_SITE_URL está definida', function () {
+    const siteUrl = Cypress.env('SITE_URL') as string | undefined
+    if (!siteUrl) this.skip()
+
+    const base = siteUrl!.replace(/\/$/, '')
+    cy.get('meta[property="og:image"]').should('have.attr', 'content', `${base}/icon.png`)
+    cy.get('meta[property="og:url"]').should('have.attr', 'content', `${base}/`)
+  })
 })

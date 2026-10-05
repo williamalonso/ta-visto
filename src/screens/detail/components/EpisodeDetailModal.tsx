@@ -37,7 +37,7 @@ export function EpisodeDetailModal({ visible, tmdbId, seasonNumber, episodeNumbe
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.overlay} onPress={onClose}>
+      <Pressable testID="episode-detail-overlay" style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.sheet} onPress={() => {}}>
           <View style={styles.handle} />
           {loading ? (

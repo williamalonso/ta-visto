@@ -44,6 +44,7 @@ export function StatusSelector({ visible, mediaType, onSelect, onClose }: Status
           {statuses.map((s) => (
             <Pressable
               key={s.value}
+              testID={`status-option-${s.value}`}
               style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
               onPress={() => onSelect(s.value)}
             >

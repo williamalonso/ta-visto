@@ -40,6 +40,9 @@ export function useDetail(id: string, mediaType: string) {
   const [tmdbDetail, setTmdbDetail] = useState<TmdbMovieDetail | TmdbTvDetail | null>(null)
   const [detailLoading, setDetailLoading] = useState(true)
   const [previewItem, setPreviewItem] = useState<MediaItem | null>(null)
+  const [celebrationKey, setCelebrationKey] = useState(0)
+
+  const celebrate = () => setCelebrationKey((k) => k + 1)
 
   const resolvedTmdbId = localItem?.tmdbId ?? (isPreview ? tmdbId : null)
 
@@ -61,6 +64,7 @@ export function useDetail(id: string, mediaType: string) {
 
   const handleStatusChange = async (status: MediaStatus) => {
     if (!localItem) return
+    if (status === 'completed' && localItem.status !== 'completed') celebrate()
     if (localItem.mediaType === 'movie') {
       await updateMovieStatus(localItem.id, status)
     } else {
@@ -98,6 +102,7 @@ export function useDetail(id: string, mediaType: string) {
     } else {
       const auto = autoStatusOnMark(next)
       if (auto) changes.status = auto
+      if (auto === 'completed' && localItem.status !== 'completed') celebrate()
     }
     return changes
   }
@@ -127,6 +132,15 @@ export function useDetail(id: string, mediaType: string) {
     else await updateSeries(localItem.id, seriesChanges(next, true))
   }
 
+  // Troca chaves sem mexer no status (usado na migração de chaves antigas de episódio)
+  const handleReplaceEpisodes = async (remove: string[], add: string[]) => {
+    if (!localItem) return
+    const current = localItem.watchedEpisodes ?? []
+    const next = [...new Set([...current.filter((k) => !remove.includes(k)), ...add])]
+    if (localItem.mediaType === 'movie') await updateMovie(localItem.id, { watchedEpisodes: next })
+    else await updateSeries(localItem.id, { watchedEpisodes: next })
+  }
+
   const handleAdd = async (status: MediaStatus, watchedEpisodes?: string[]) => {
     if (!previewItem) return
     let resolvedEpisodes = watchedEpisodes
@@ -152,6 +166,7 @@ export function useDetail(id: string, mediaType: string) {
       notes: null as null,
       ...(resolvedEpisodes?.length ? { watchedEpisodes: resolvedEpisodes } : {}),
     }
+    if (status === 'completed') celebrate()
     if (previewItem.mediaType === 'movie') await addMovie(base)
     else await addSeries(base)
   }
@@ -211,6 +226,8 @@ export function useDetail(id: string, mediaType: string) {
     handleUnmarkEpisodes,
     handleRemove,
     handleAdd,
+    handleReplaceEpisodes,
+    celebrationKey,
     cast,
     directors,
     creators,

@@ -14,6 +14,7 @@ import { DetailCast } from './components/DetailCast'
 import { DetailRecommendations } from './components/DetailRecommendations'
 import { SymbolView } from 'expo-symbols'
 import { DeleteConfirmModal } from './components/DeleteConfirmModal'
+import { Confetti } from './components/Confetti'
 import { WatchProvidersModal } from '@/components/WatchProvidersModal'
 import { useMovies } from '@/hooks/useMovies'
 import { useSeries } from '@/hooks/useSeries'
@@ -50,6 +51,8 @@ export default function DetailScreen() {
     handleUnmarkEpisodes,
     handleRemove,
     handleAdd,
+    handleReplaceEpisodes,
+    celebrationKey,
     isPreview,
     cast,
     directors,
@@ -143,6 +146,7 @@ export default function DetailScreen() {
                   }
                 }}
                 onUnmarkEpisodes={handleUnmarkEpisodes}
+                onReplaceEpisodes={handleReplaceEpisodes}
               />
             ) : null}
           </View>
@@ -206,6 +210,8 @@ export default function DetailScreen() {
           setStatusSelectorVisible(false)
         }}
       />
+
+      <Confetti trigger={celebrationKey} />
     </SafeAreaView>
   )
 }

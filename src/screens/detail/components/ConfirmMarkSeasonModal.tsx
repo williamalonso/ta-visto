@@ -3,30 +3,43 @@ import { colors, radius, spacing, typography } from '@/theme'
 
 interface Props {
   visible: boolean
+  mode: 'mark' | 'unmark'
   count: number
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function ConfirmMarkSeasonModal({ visible, count, onConfirm, onCancel }: Props) {
+const COPY = {
+  mark: {
+    title: 'Marcar temporada?',
+    body: (count: number) => `Marcar todos os ${count} episódios como assistidos?`,
+    confirm: 'Confirmar',
+  },
+  unmark: {
+    title: 'Desmarcar temporada?',
+    body: (count: number) => `Desmarcar todos os ${count} episódios desta temporada?`,
+    confirm: 'Desmarcar',
+  },
+}
+
+export function ConfirmMarkSeasonModal({ visible, mode, count, onConfirm, onCancel }: Props) {
+  const copy = COPY[mode]
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <Pressable style={styles.overlay} onPress={onCancel}>
         <Pressable style={styles.dialog} onPress={() => {}}>
-          <Text style={styles.title}>Marcar temporada?</Text>
-          <Text style={styles.body}>
-            Marcar todos os {count} episódios como assistidos?
-          </Text>
+          <Text style={styles.title}>{copy.title}</Text>
+          <Text style={styles.body}>{copy.body(count)}</Text>
           <View style={styles.actions}>
             <Pressable style={[styles.btn, styles.secondary]} onPress={onCancel}>
               <Text style={styles.secondaryText}>Cancelar</Text>
             </Pressable>
             <Pressable
               testID="confirm-mark-season-btn"
-              style={[styles.btn, styles.primary]}
+              style={[styles.btn, mode === 'unmark' ? styles.danger : styles.primary]}
               onPress={onConfirm}
             >
-              <Text style={styles.primaryText}>Confirmar</Text>
+              <Text style={mode === 'unmark' ? styles.dangerText : styles.primaryText}>{copy.confirm}</Text>
             </Pressable>
           </View>
         </Pressable>
@@ -80,6 +93,14 @@ const styles = StyleSheet.create({
   },
   primary: {
     backgroundColor: colors.primary,
+  },
+  danger: {
+    backgroundColor: colors.error,
+  },
+  dangerText: {
+    ...typography.auxiliary,
+    color: colors.white,
+    fontWeight: '700',
   },
   primaryText: {
     ...typography.auxiliary,
